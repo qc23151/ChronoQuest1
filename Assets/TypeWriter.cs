@@ -5,7 +5,7 @@ using TMPro;
 
 public class Typewriter : MonoBehaviour
 {
-    public float timePerCharacter = 0.05f;
+    public float timePerCharacter = 0.03f;
 
     private string displayMessage = "";
     private float timer = 0f; 

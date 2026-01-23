@@ -49,6 +49,7 @@ public class TutorialManager : MonoBehaviour
 
     void Update()
     {
+        // on every update, check if player is within distance to trigger the attack tutorial 
         CheckAttackDistance();
         
         if (moveCompleted && attackCompleted && rewindCompleted)
@@ -107,6 +108,7 @@ public class TutorialManager : MonoBehaviour
             return;
         currentStep = step;
 
+        // based on the current step, show the corresponding tutorial hint
         switch (step)
         {
             case TutorialStep.Movement:
@@ -127,6 +129,7 @@ public class TutorialManager : MonoBehaviour
         }
     }
 
+    // hints disabled once tutorial is complete
     void DisableHints()
     {
         rewindHint.SetActive(false);
