@@ -2,10 +2,6 @@ using UnityEngine;
 
 namespace TimeRewind
 {
-    /// <summary>
-    /// A lightweight rewindable component that only records transform data.
-    /// Ideal for static objects, props, or objects without physics.
-    /// </summary>
     public class RewindableTransform : MonoBehaviour, IRewindable
     {
         [Header("Settings")]
@@ -14,9 +10,6 @@ namespace TimeRewind
         
         private bool _isRewinding;
         
-        /// <summary>
-        /// Whether this object is currently being rewound
-        /// </summary>
         public bool IsRewinding => _isRewinding;
         
         #region Unity Lifecycle

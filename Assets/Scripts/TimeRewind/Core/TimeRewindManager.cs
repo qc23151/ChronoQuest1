@@ -4,19 +4,12 @@ using UnityEngine;
 
 namespace TimeRewind
 {
-    /// <summary>
-    /// Central manager for the time rewind system.
-    /// Handles registration of rewindable objects, state recording, and rewind playback.
-    /// </summary>
     public class TimeRewindManager : MonoBehaviour
     {
         #region Singleton
         
         private static TimeRewindManager _instance;
         
-        /// <summary>
-        /// Singleton instance of the TimeRewindManager
-        /// </summary>
         public static TimeRewindManager Instance
         {
             get
@@ -33,7 +26,6 @@ namespace TimeRewind
                     }
                 }
                 
-                // Ensure initialization even if Awake hasn't run yet
                 _instance.EnsureInitialized();
                 
                 return _instance;
@@ -72,14 +64,8 @@ namespace TimeRewind
 
         #region Properties
         
-        /// <summary>
-        /// Whether time is currently being rewound
-        /// </summary>
         public bool IsRewinding => _isRewinding;
         
-        /// <summary>
-        /// Whether there is enough history to rewind
-        /// </summary>
         public bool CanRewind
         {
             get
@@ -96,9 +82,6 @@ namespace TimeRewind
             }
         }
         
-        /// <summary>
-        /// Progress of rewind (0 = current time, 1 = oldest recorded time)
-        /// </summary>
         public float RewindProgress
         {
             get
@@ -117,9 +100,6 @@ namespace TimeRewind
             }
         }
         
-        /// <summary>
-        /// Remaining rewind time available in seconds
-        /// </summary>
         public float RemainingRewindTime
         {
             get
@@ -132,28 +112,14 @@ namespace TimeRewind
             }
         }
         
-        /// <summary>
-        /// Maximum rewind duration setting
-        /// </summary>
         public float MaxRewindDuration => maxRewindDuration;
         
         #endregion
 
         #region Events
         
-        /// <summary>
-        /// Called when rewind starts
-        /// </summary>
         public event Action OnRewindStart;
-        
-        /// <summary>
-        /// Called when rewind stops
-        /// </summary>
         public event Action OnRewindStop;
-        
-        /// <summary>
-        /// Called every frame during rewind with progress (0-1)
-        /// </summary>
         public event Action<float> OnRewindProgress;
         
         #endregion
@@ -208,10 +174,6 @@ namespace TimeRewind
 
         #region Public Methods
         
-        /// <summary>
-        /// Register a rewindable object with the manager
-        /// </summary>
-        /// <param name="rewindable">The object to register</param>
         public void Register(IRewindable rewindable)
         {
             if (rewindable == null)
@@ -224,15 +186,8 @@ namespace TimeRewind
             
             int bufferCapacity = Mathf.CeilToInt(maxRewindDuration * recordsPerSecond);
             _rewindables[rewindable] = new RewindBuffer<RewindState>(bufferCapacity);
-            
-            if (enableDebugLogs)
-                Debug.Log($"[TimeRewind] Registered: {(rewindable as MonoBehaviour)?.gameObject.name ?? "Unknown"}");
         }
         
-        /// <summary>
-        /// Unregister a rewindable object from the manager
-        /// </summary>
-        /// <param name="rewindable">The object to unregister</param>
         public void Unregister(IRewindable rewindable)
         {
             if (rewindable == null)
@@ -241,9 +196,6 @@ namespace TimeRewind
             _rewindables.Remove(rewindable);
         }
         
-        /// <summary>
-        /// Start rewinding time (call when rewind button is pressed)
-        /// </summary>
         public void StartRewind()
         {
             if (_isRewinding)
@@ -266,7 +218,6 @@ namespace TimeRewind
             if (enableDebugLogs)
                 Debug.Log($"[TimeRewind] Rewind STARTED at time {_currentRewindTime:F2}");
             
-            // Notify all rewindables
             foreach (var rewindable in _rewindables.Keys)
             {
                 var mb = rewindable as MonoBehaviour;
@@ -277,9 +228,6 @@ namespace TimeRewind
             OnRewindStart?.Invoke();
         }
         
-        /// <summary>
-        /// Stop rewinding time (call when rewind button is released)
-        /// </summary>
         public void StopRewind()
         {
             if (!_isRewinding)
@@ -287,10 +235,8 @@ namespace TimeRewind
             
             _isRewinding = false;
             
-            // Trim future states from all buffers
             TrimFutureStates();
             
-            // Notify all rewindables
             foreach (var rewindable in _rewindables.Keys)
             {
                 var mb = rewindable as MonoBehaviour;
@@ -301,9 +247,6 @@ namespace TimeRewind
             OnRewindStop?.Invoke();
         }
         
-        /// <summary>
-        /// Clear all recorded history
-        /// </summary>
         public void ClearHistory()
         {
             foreach (var buffer in _rewindables.Values)
@@ -332,12 +275,10 @@ namespace TimeRewind
         
         private void RecordCurrentStates()
         {
-            // Collect any destroyed objects to remove
             List<IRewindable> toRemove = null;
             
             foreach (var kvp in _rewindables)
             {
-                // Check if the rewindable (MonoBehaviour) was destroyed
                 var mb = kvp.Key as MonoBehaviour;
                 if (mb == null)
                 {
@@ -350,45 +291,28 @@ namespace TimeRewind
                 kvp.Value.Add(state);
             }
             
-            // Remove destroyed objects
             if (toRemove != null)
             {
                 foreach (var item in toRemove)
                 {
                     _rewindables.Remove(item);
-                    if (enableDebugLogs)
-                        Debug.Log("[TimeRewind] Removed destroyed rewindable");
-                }
-            }
-            
-            // Log periodically (every ~1 second)
-            if (enableDebugLogs && Time.frameCount % 50 == 0 && _rewindables.Count > 0)
-            {
-                var firstBuffer = _rewindables.Values.GetEnumerator();
-                if (firstBuffer.MoveNext())
-                {
-                    Debug.Log($"[TimeRewind] Recording... States buffered: {firstBuffer.Current.Count}");
                 }
             }
         }
         
         private void UpdateRewind()
         {
-            // Move backward in time
             _currentRewindTime -= Time.deltaTime * rewindSpeed;
             
             float oldestTime = GetOldestRecordedTime();
             
-            // Clamp to oldest available time
             if (_currentRewindTime < oldestTime)
             {
                 _currentRewindTime = oldestTime;
             }
             
-            // Apply interpolated states to all rewindables
             foreach (var kvp in _rewindables)
             {
-                // Skip destroyed objects
                 var mb = kvp.Key as MonoBehaviour;
                 if (mb == null)
                     continue;
@@ -419,7 +343,6 @@ namespace TimeRewind
                 if (!buffer.HasStates)
                     continue;
                 
-                // Find how many states to keep (those with timestamp <= current rewind time)
                 int keepCount = 0;
                 for (int i = 0; i < buffer.Count; i++)
                 {

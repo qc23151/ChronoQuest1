@@ -4,10 +4,6 @@ using UnityEngine.Rendering.Universal;
 
 namespace TimeRewind
 {
-    /// <summary>
-    /// Provides visual and audio feedback during time rewind.
-    /// Attach this to a GameObject to enable rewind effects.
-    /// </summary>
     public class RewindEffects : MonoBehaviour
     {
         [Header("Visual Effects")]
@@ -71,13 +67,11 @@ namespace TimeRewind
         
         private void Start()
         {
-            // Initialize post-processing if volume is assigned
             if (postProcessVolume != null && postProcessVolume.profile != null)
             {
                 InitializePostProcessing();
             }
             
-            // Hide UI elements initially
             if (rewindIndicator != null)
                 rewindIndicator.SetActive(false);
             
@@ -87,7 +81,6 @@ namespace TimeRewind
         
         private void OnEnable()
         {
-            // Subscribe to rewind events
             if (TimeRewindManager.Instance != null)
             {
                 TimeRewindManager.Instance.OnRewindStart += HandleRewindStart;
@@ -98,7 +91,6 @@ namespace TimeRewind
         
         private void OnDisable()
         {
-            // Unsubscribe from rewind events
             if (TimeRewindManager.Instance != null)
             {
                 TimeRewindManager.Instance.OnRewindStart -= HandleRewindStart;
@@ -120,19 +112,16 @@ namespace TimeRewind
         {
             var profile = postProcessVolume.profile;
             
-            // Get or add color adjustments
             if (profile.TryGet(out _colorAdjustments))
             {
                 _originalSaturation = _colorAdjustments.saturation.value;
             }
             
-            // Get or add chromatic aberration
             if (profile.TryGet(out _chromaticAberration))
             {
                 _originalChromaticAberration = _chromaticAberration.intensity.value;
             }
             
-            // Get or add vignette
             if (profile.TryGet(out _vignette))
             {
                 _originalVignetteIntensity = _vignette.intensity.value;
@@ -147,13 +136,11 @@ namespace TimeRewind
         {
             _isRewinding = true;
             
-            // Play start sound
             if (audioSource != null && rewindStartSound != null)
             {
                 audioSource.PlayOneShot(rewindStartSound);
             }
             
-            // Start loop sound
             if (audioSource != null && rewindLoopSound != null)
             {
                 audioSource.clip = rewindLoopSound;
@@ -161,7 +148,6 @@ namespace TimeRewind
                 audioSource.Play();
             }
             
-            // Show UI
             if (rewindIndicator != null)
                 rewindIndicator.SetActive(true);
         }
@@ -170,26 +156,22 @@ namespace TimeRewind
         {
             _isRewinding = false;
             
-            // Stop loop sound
             if (audioSource != null && audioSource.isPlaying && audioSource.clip == rewindLoopSound)
             {
                 audioSource.Stop();
             }
             
-            // Play end sound
             if (audioSource != null && rewindEndSound != null)
             {
                 audioSource.PlayOneShot(rewindEndSound);
             }
             
-            // Hide UI
             if (rewindIndicator != null)
                 rewindIndicator.SetActive(false);
         }
         
         private void HandleRewindProgress(float progress)
         {
-            // Update progress bar
             if (progressBar != null)
             {
                 progressBar.fillAmount = progress;
@@ -248,9 +230,6 @@ namespace TimeRewind
 
         #region Public Methods
         
-        /// <summary>
-        /// Manually set the post-processing volume at runtime
-        /// </summary>
         public void SetPostProcessVolume(Volume volume)
         {
             postProcessVolume = volume;
@@ -260,9 +239,6 @@ namespace TimeRewind
             }
         }
         
-        /// <summary>
-        /// Manually set the audio source at runtime
-        /// </summary>
         public void SetAudioSource(AudioSource source)
         {
             audioSource = source;

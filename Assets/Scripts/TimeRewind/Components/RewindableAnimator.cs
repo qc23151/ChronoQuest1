@@ -2,11 +2,6 @@ using UnityEngine;
 
 namespace TimeRewind
 {
-    /// <summary>
-    /// A rewindable component for objects with Animator.
-    /// Records and restores animator state during time rewind.
-    /// Can be used alongside RewindableTransform or RewindableRigidbody2D.
-    /// </summary>
     [RequireComponent(typeof(Animator))]
     public class RewindableAnimator : MonoBehaviour, IRewindable
     {
@@ -21,14 +16,7 @@ namespace TimeRewind
         private bool _isRewinding;
         private float _originalSpeed;
         
-        /// <summary>
-        /// Whether this object is currently being rewound
-        /// </summary>
         public bool IsRewinding => _isRewinding;
-        
-        /// <summary>
-        /// Reference to the Animator component
-        /// </summary>
         public Animator Animator => _animator;
         
         #region Unity Lifecycle
@@ -58,8 +46,6 @@ namespace TimeRewind
         public void OnStartRewind()
         {
             _isRewinding = true;
-            
-            // Store and pause animator
             _originalSpeed = _animator.speed;
             _animator.speed = 0f;
         }
@@ -67,8 +53,6 @@ namespace TimeRewind
         public void OnStopRewind()
         {
             _isRewinding = false;
-            
-            // Restore animator speed
             _animator.speed = _originalSpeed;
         }
         
@@ -94,10 +78,7 @@ namespace TimeRewind
         
         public void ApplyState(RewindState state)
         {
-            // Restore animator state
             _animator.Play(state.AnimatorStateHash, animatorLayer, state.AnimatorNormalizedTime);
-            
-            // Force animator to update immediately
             _animator.Update(0f);
             
             if (includeTransform)

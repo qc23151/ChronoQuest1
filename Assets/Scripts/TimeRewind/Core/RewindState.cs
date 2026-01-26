@@ -3,57 +3,18 @@ using UnityEngine;
 
 namespace TimeRewind
 {
-    /// <summary>
-    /// Represents a snapshot of an object's state at a specific point in time.
-    /// Used for recording and restoring object states during time rewind.
-    /// </summary>
     [System.Serializable]
     public struct RewindState
     {
-        /// <summary>
-        /// The timestamp when this state was recorded (using Time.time)
-        /// </summary>
         public float Timestamp;
-
-        /// <summary>
-        /// World position of the object
-        /// </summary>
         public Vector3 Position;
-
-        /// <summary>
-        /// World rotation of the object
-        /// </summary>
         public Quaternion Rotation;
-
-        /// <summary>
-        /// Linear velocity (for Rigidbody objects)
-        /// </summary>
         public Vector2 Velocity;
-
-        /// <summary>
-        /// Angular velocity (for Rigidbody objects)
-        /// </summary>
         public float AngularVelocity;
-
-        /// <summary>
-        /// Animator state hash (for animated objects)
-        /// </summary>
         public int AnimatorStateHash;
-
-        /// <summary>
-        /// Animator normalized time (for animated objects)
-        /// </summary>
         public float AnimatorNormalizedTime;
-
-        /// <summary>
-        /// Custom data dictionary for extensibility (health, ammo, etc.)
-        /// Note: Only use serializable types as values
-        /// </summary>
         public Dictionary<string, object> CustomData;
 
-        /// <summary>
-        /// Creates a new RewindState with the given transform data
-        /// </summary>
         public static RewindState Create(Vector3 position, Quaternion rotation, float timestamp)
         {
             return new RewindState
@@ -69,9 +30,6 @@ namespace TimeRewind
             };
         }
 
-        /// <summary>
-        /// Creates a new RewindState with transform and physics data
-        /// </summary>
         public static RewindState CreateWithPhysics(
             Vector3 position, 
             Quaternion rotation, 
@@ -92,13 +50,6 @@ namespace TimeRewind
             };
         }
 
-        /// <summary>
-        /// Linearly interpolate between two states
-        /// </summary>
-        /// <param name="a">Start state</param>
-        /// <param name="b">End state</param>
-        /// <param name="t">Interpolation factor (0-1)</param>
-        /// <returns>Interpolated state</returns>
         public static RewindState Lerp(RewindState a, RewindState b, float t)
         {
             return new RewindState
@@ -114,18 +65,12 @@ namespace TimeRewind
             };
         }
 
-        /// <summary>
-        /// Set a custom data value
-        /// </summary>
         public void SetCustomData(string key, object value)
         {
             CustomData ??= new Dictionary<string, object>();
             CustomData[key] = value;
         }
 
-        /// <summary>
-        /// Get a custom data value
-        /// </summary>
         public T GetCustomData<T>(string key, T defaultValue = default)
         {
             if (CustomData == null || !CustomData.TryGetValue(key, out var value))

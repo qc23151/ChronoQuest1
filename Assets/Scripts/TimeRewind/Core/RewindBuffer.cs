@@ -3,43 +3,19 @@ using UnityEngine;
 
 namespace TimeRewind
 {
-    /// <summary>
-    /// A circular buffer for storing rewind states efficiently.
-    /// Automatically overwrites oldest entries when capacity is reached.
-    /// </summary>
-    /// <typeparam name="T">The type of state to store</typeparam>
     public class RewindBuffer<T> where T : struct
     {
         private readonly T[] _buffer;
         private readonly int _capacity;
-        private int _head;      // Points to the next write position
-        private int _tail;      // Points to the oldest entry
+        private int _head;
+        private int _tail;
         private int _count;
 
-        /// <summary>
-        /// Current number of states stored in the buffer
-        /// </summary>
         public int Count => _count;
-
-        /// <summary>
-        /// Maximum capacity of the buffer
-        /// </summary>
         public int Capacity => _capacity;
-
-        /// <summary>
-        /// Whether the buffer has any states stored
-        /// </summary>
         public bool HasStates => _count > 0;
-
-        /// <summary>
-        /// Whether the buffer is full
-        /// </summary>
         public bool IsFull => _count == _capacity;
 
-        /// <summary>
-        /// Creates a new RewindBuffer with the specified capacity
-        /// </summary>
-        /// <param name="capacity">Maximum number of states to store</param>
         public RewindBuffer(int capacity)
         {
             if (capacity <= 0)
@@ -52,11 +28,6 @@ namespace TimeRewind
             _count = 0;
         }
 
-        /// <summary>
-        /// Add a new state to the buffer.
-        /// If the buffer is full, the oldest state will be overwritten.
-        /// </summary>
-        /// <param name="state">The state to add</param>
         public void Add(T state)
         {
             _buffer[_head] = state;
@@ -68,16 +39,10 @@ namespace TimeRewind
             }
             else
             {
-                // Buffer is full, move tail forward (oldest entry is overwritten)
                 _tail = (_tail + 1) % _capacity;
             }
         }
 
-        /// <summary>
-        /// Get a state at a specific index (0 = oldest, Count-1 = newest)
-        /// </summary>
-        /// <param name="index">Index from oldest to newest</param>
-        /// <returns>The state at the specified index</returns>
         public T Get(int index)
         {
             if (index < 0 || index >= _count)
@@ -87,10 +52,6 @@ namespace TimeRewind
             return _buffer[actualIndex];
         }
 
-        /// <summary>
-        /// Get the newest (most recent) state
-        /// </summary>
-        /// <returns>The most recent state</returns>
         public T GetNewest()
         {
             if (_count == 0)
@@ -100,10 +61,6 @@ namespace TimeRewind
             return _buffer[newestIndex];
         }
 
-        /// <summary>
-        /// Get the oldest state
-        /// </summary>
-        /// <returns>The oldest state</returns>
         public T GetOldest()
         {
             if (_count == 0)
@@ -112,10 +69,6 @@ namespace TimeRewind
             return _buffer[_tail];
         }
 
-        /// <summary>
-        /// Remove and return the newest state (pop from the end)
-        /// </summary>
-        /// <returns>The newest state that was removed</returns>
         public T PopNewest()
         {
             if (_count == 0)
@@ -126,11 +79,6 @@ namespace TimeRewind
             return _buffer[_head];
         }
 
-        /// <summary>
-        /// Remove all states added after the specified index.
-        /// Useful when resuming from a rewound position.
-        /// </summary>
-        /// <param name="keepCount">Number of states to keep (from oldest)</param>
         public void TrimToCount(int keepCount)
         {
             if (keepCount < 0)
@@ -143,9 +91,6 @@ namespace TimeRewind
             _head = (_tail + keepCount) % _capacity;
         }
 
-        /// <summary>
-        /// Clear all states from the buffer
-        /// </summary>
         public void Clear()
         {
             _head = 0;
@@ -153,19 +98,11 @@ namespace TimeRewind
             _count = 0;
         }
 
-        /// <summary>
-        /// Find the index of the state closest to the target timestamp.
-        /// Assumes states are ordered by timestamp (oldest to newest).
-        /// </summary>
-        /// <param name="targetTimestamp">The timestamp to search for</param>
-        /// <param name="getTimestamp">Function to extract timestamp from state</param>
-        /// <returns>Index of the closest state, or -1 if buffer is empty</returns>
         public int FindClosestIndex(float targetTimestamp, Func<T, float> getTimestamp)
         {
             if (_count == 0)
                 return -1;
 
-            // Binary search for efficiency
             int left = 0;
             int right = _count - 1;
 
@@ -180,7 +117,6 @@ namespace TimeRewind
                     right = mid;
             }
 
-            // Check if we should return left or left-1
             if (left > 0)
             {
                 float leftTimestamp = getTimestamp(Get(left));
@@ -193,15 +129,6 @@ namespace TimeRewind
             return left;
         }
 
-        /// <summary>
-        /// Get two states that bracket the target timestamp for interpolation.
-        /// </summary>
-        /// <param name="targetTimestamp">The timestamp to find</param>
-        /// <param name="getTimestamp">Function to extract timestamp from state</param>
-        /// <param name="before">State before the timestamp</param>
-        /// <param name="after">State after the timestamp</param>
-        /// <param name="t">Interpolation factor (0-1)</param>
-        /// <returns>True if bracketing states were found, false otherwise</returns>
         public bool GetInterpolationStates(
             float targetTimestamp, 
             Func<T, float> getTimestamp,
@@ -224,15 +151,11 @@ namespace TimeRewind
                 return true;
             }
 
-            // Find the first state with timestamp >= target
             int afterIndex = FindClosestIndex(targetTimestamp, getTimestamp);
-            
-            // Clamp to valid range
             afterIndex = Mathf.Clamp(afterIndex, 0, _count - 1);
             
             float afterTimestamp = getTimestamp(Get(afterIndex));
             
-            // If target is before the oldest state
             if (afterIndex == 0 && targetTimestamp <= afterTimestamp)
             {
                 before = Get(0);
@@ -241,7 +164,6 @@ namespace TimeRewind
                 return true;
             }
 
-            // If target is at or after the newest state
             if (afterIndex == _count - 1 && targetTimestamp >= afterTimestamp)
             {
                 before = Get(_count - 1);
@@ -250,7 +172,6 @@ namespace TimeRewind
                 return true;
             }
 
-            // Find the state before
             int beforeIndex = afterIndex > 0 ? afterIndex - 1 : afterIndex;
             
             before = Get(beforeIndex);
@@ -259,7 +180,6 @@ namespace TimeRewind
             float beforeTimestamp = getTimestamp(before);
             afterTimestamp = getTimestamp(after);
 
-            // Calculate interpolation factor
             float duration = afterTimestamp - beforeTimestamp;
             if (duration > 0)
                 t = (targetTimestamp - beforeTimestamp) / duration;
