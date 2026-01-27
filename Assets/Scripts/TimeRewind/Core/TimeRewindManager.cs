@@ -181,6 +181,11 @@ namespace TimeRewind
                 
             EnsureInitialized();
             
+            if (_rewindables == null)
+            {
+                _rewindables = new Dictionary<IRewindable, RewindBuffer<RewindState>>();
+            }
+            
             if (_rewindables.ContainsKey(rewindable))
                 return;
             
@@ -190,7 +195,7 @@ namespace TimeRewind
         
         public void Unregister(IRewindable rewindable)
         {
-            if (rewindable == null)
+            if (rewindable == null || _rewindables == null)
                 return;
             
             _rewindables.Remove(rewindable);

@@ -23,10 +23,6 @@ namespace TimeRewind
         [SerializeField] private float effectTransitionSpeed = 5f;
         
         [Header("Screen Tint")]
-        [Tooltip("Apply a color tint during rewind")]
-        [SerializeField] private bool useScreenTint = true;
-        
-        [Tooltip("The color tint to apply")]
         [SerializeField] private Color rewindTintColor = new Color(0.5f, 0.7f, 1f, 0.2f);
         
         [Header("Audio Effects")]

@@ -27,7 +27,11 @@ namespace TimeRewind
         
         private void OnEnable()
         {
-            TimeRewindManager.Instance.Register(this);
+            var manager = TimeRewindManager.Instance;
+            if (manager != null)
+            {
+                manager.Register(this);
+            }
         }
         
         private void OnDisable()

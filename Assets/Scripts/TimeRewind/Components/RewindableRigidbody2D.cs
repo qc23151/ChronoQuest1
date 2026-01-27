@@ -7,7 +7,6 @@ namespace TimeRewind
     {
         private Rigidbody2D _rb;
         private bool _isRewinding;
-        private bool _wasKinematic;
         private RigidbodyType2D _originalBodyType;
         
         public bool IsRewinding => _isRewinding;
@@ -40,7 +39,6 @@ namespace TimeRewind
         public virtual void OnStartRewind()
         {
             _isRewinding = true;
-            _wasKinematic = _rb.isKinematic;
             _originalBodyType = _rb.bodyType;
             _rb.bodyType = RigidbodyType2D.Kinematic;
             _rb.linearVelocity = Vector2.zero;
@@ -72,7 +70,7 @@ namespace TimeRewind
         
         protected virtual void RestoreVelocity(RewindState lastState)
         {
-            if (!_wasKinematic)
+            if (_originalBodyType == RigidbodyType2D.Dynamic)
             {
                 _rb.linearVelocity = lastState.Velocity;
                 _rb.angularVelocity = lastState.AngularVelocity;
