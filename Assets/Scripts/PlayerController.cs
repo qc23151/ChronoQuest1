@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
@@ -7,7 +8,6 @@ public class PlayerController : MonoBehaviour
     public int maxHealth = 100;
     public int currentHealth;
     bool lowHealthWarningShown = false;
-
 
     public float moveSpeed = 5f;                    // speed of player, will likely be changed when animations are added to tutorial
     public float attackLunge = 1f; 
