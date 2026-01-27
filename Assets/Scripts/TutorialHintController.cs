@@ -1,9 +1,10 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerController : MonoBehaviour
+public class TutorialHintController : MonoBehaviour
 {
     public TutorialManager tutorialManager;
+    public PlayerPlatformer player; 
     
     public int maxHealth = 100;
     public int currentHealth;
@@ -11,6 +12,9 @@ public class PlayerController : MonoBehaviour
 
     public float moveSpeed = 5f;                    // speed of player, will likely be changed when animations are added to tutorial
     public float attackLunge = 1f; 
+
+    private bool moveTriggered;
+    // private bool jumpTriggered;          for when jumping movement is added to tutorial
     
     void Start()
     {
@@ -19,26 +23,17 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        // temporary player movement logic on key press for tutorial purposes 
-        float move = Input.GetAxis("Horizontal");
-
-        if (move != 0)
+        if (!moveTriggered && Mathf.Abs(player.horizontalInput) > 0.1f)
         {
-            transform.Translate(Vector2.right * move * moveSpeed * Time.deltaTime);
-
-            if (tutorialManager != null)
-            {
-                tutorialManager.OnPlayerMoved();
-            }
+            moveTriggered = true;
+            tutorialManager?.OnPlayerMoved();
         }
 
-        // trigger attack on space bar key press
-        if (Input.GetKeyDown(KeyCode.Space))
-            StartAttack();
-        
-        // trigger rewind on R key press
-        if (Input.GetKeyDown(KeyCode.R))
-            TriggerRewind();
+        /* if (!jumpTriggered && !player.isGrounded)
+        {
+            jumpTriggered = true;
+            tutorialManager?.OnPlayerJumped();
+        } */ 
     }
 
     void StartAttack()

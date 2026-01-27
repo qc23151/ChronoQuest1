@@ -790,6 +790,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1200219678}
   m_CullTransparentMesh: 1
+--- !u!1 &1236727383
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1236727384}
+  m_Layer: 0
+  m_Name: GroundCheck
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1236727384
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1236727383}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -5.31, y: -2.51, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1347648717
 GameObject:
   m_ObjectHideFlags: 0
@@ -879,6 +910,7 @@ GameObject:
   - component: {fileID: 1373591020}
   - component: {fileID: 1373591021}
   - component: {fileID: 1373591022}
+  - component: {fileID: 1373591023}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -977,6 +1009,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   tutorialManager: {fileID: 898589881}
+  player: {fileID: 1373591023}
   maxHealth: 100
   currentHealth: 0
   moveSpeed: 5
@@ -1054,6 +1087,27 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 3.125, y: 2.9462981}
   m_EdgeRadius: 0
+--- !u!114 &1373591023
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1373591017}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eaafb7039bb85bf4cb0ba1ffc4c87793, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerPlatformer
+  moveSpeed: 5
+  jumpForce: 10
+  horizontalInput: 0
+  groundCheck: {fileID: 1236727384}
+  groundCheckRadius: 0.2
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  isGrounded: 0
 --- !u!1 &1454794536
 GameObject:
   m_ObjectHideFlags: 0
@@ -1537,3 +1591,4 @@ SceneRoots:
   - {fileID: 898589882}
   - {fileID: 1864852612}
   - {fileID: 254002546}
+  - {fileID: 1236727384}
