@@ -1,9 +1,9 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using TMPro;
 
 public class TutorialManager : MonoBehaviour
 {
-    // setting the order of tutorial steps
     public enum TutorialStep
     {
         None,
@@ -15,7 +15,7 @@ public class TutorialManager : MonoBehaviour
     }
 
     public TutorialStep currentStep = TutorialStep.None; 
-    
+
     public GameObject rewindHint;
     public GameObject attackHint;
     public GameObject movementHint;
@@ -25,7 +25,7 @@ public class TutorialManager : MonoBehaviour
     public Transform enemy;
     public Transform platform; 
     public float attackDistance = 5f;
-    public float jumpDistance = 3f; 
+    public float jumpDistance = 5.5f; 
 
     bool moveCompleted = false;
     bool attackCompleted = false;
@@ -62,12 +62,10 @@ public class TutorialManager : MonoBehaviour
 
     void Update()
     {
-        Debug.Log("Current Step:" + currentStep);
-        
         // on every update, check if player is within distance to trigger the attack tutorial 
         CheckPlayerIdle();
         CheckAttackDistance();
-        CheckJumpDistance();
+        CheckJumpPrompt();
         
         if (moveCompleted && attackCompleted && rewindCompleted && jumpCompleted)
         {
@@ -90,29 +88,30 @@ public class TutorialManager : MonoBehaviour
         }
     }
 
-    void CheckJumpDistance()
+   void CheckJumpPrompt()
     {
-        if (jumpCompleted)
-            return;
-        
-        float distance = Vector2.Distance(player.transform.position, platform.position);
+        if (jumpCompleted) return;
+        if (currentStep != TutorialStep.Movement) return;
+        if (!player.isGrounded) return;
 
-        if (distance <= jumpDistance)
-        {
-            SetStep(TutorialStep.Jump);
-        }
+        // perform idle and proximity check
+        float movementDelta = Vector2.Distance(player.transform.position, lastPlayerPosition);
+        if (movementDelta > 0.01f) return;
+
+        float distance = Vector2.Distance(player.transform.position, platform.position);
+        if (distance > jumpDistance) return;
+
+        SetStep(TutorialStep.Jump);
     }
+
+
 
     void CheckPlayerIdle()
     {
-        Debug.Log($"Idle timer: {idleTimer}");
-
         float movementDelta = Vector2.Distance(
             player.transform.position,
             lastPlayerPosition
         );
-
-        Debug.Log($"Movement delta: {movementDelta}");
         
         if (movementDelta < 0.01f)
         {
@@ -167,12 +166,12 @@ public class TutorialManager : MonoBehaviour
 
     public void OnPlayerJump()
     {
-        if (currentStep == TutorialStep.Jump && !jumpCompleted)
-        {
-            jumpCompleted = true;
-            jumpHint.SetActive(false); 
-            Debug.Log("Player jump tutorial complete");
-        }
+        if (currentStep != TutorialStep.Jump) return;
+        if (jumpCompleted) return;
+
+        jumpCompleted = true;
+        jumpHint.SetActive(false); 
+        Debug.Log("Player jump tutorial complete");
     }
 
     // setting the current tutorial step and showing corresponding hint

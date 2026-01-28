@@ -17,11 +17,14 @@ public class PlayerPlatformer : MonoBehaviour
     [SerializeField] private Transform groundCheck;
     [SerializeField] private float groundCheckRadius = 0.35f;
     [SerializeField] private LayerMask groundLayer;
-    private bool isGrounded;
+    public bool isGrounded;
     
     [Header("Jump Buffer")]
     [SerializeField] private float jumpBufferTime = 0.1f;
     private float jumpBufferCounter;
+
+    public TutorialManager tutorialManager;
+
 
     private void Awake()
     {
@@ -49,6 +52,8 @@ public class PlayerPlatformer : MonoBehaviour
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
             jumpBufferCounter = 0;
+
+            tutorialManager?.OnPlayerJump();
         }
     }
 

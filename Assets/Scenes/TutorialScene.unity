@@ -145,7 +145,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 254002544}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c996580f899c24d40a1b5fe013137be6, type: 3}
+  m_Script: {fileID: 11500000, guid: de25389451c04486f9159daa17f41bab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Typewriter
   timePerCharacter: 0.03
@@ -843,7 +843,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'To rewind time, press the R key. '
+  m_text: Press the R key to rewind.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 9a14a8a1184c5f14fbce3338ea4d7a35, type: 2}
   m_sharedMaterial: {fileID: 1260715531048141648, guid: 9a14a8a1184c5f14fbce3338ea4d7a35, type: 2}
@@ -949,7 +949,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 898589880}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a0f7c90ac911e4161b09c0899a0b02db, type: 3}
+  m_Script: {fileID: 11500000, guid: 9f09bb9a4b3e14b64bc57a45a2bf93c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
   currentStep: 0
@@ -957,7 +957,7 @@ MonoBehaviour:
   attackHint: {fileID: 1347648717}
   movementHint: {fileID: 1982164483}
   jumpHint: {fileID: 298495539}
-  player: {fileID: 1373591023}
+  player: {fileID: 1373591020}
   enemy: {fileID: 843516803}
   platform: {fileID: 1799452524}
   attackDistance: 5
@@ -967,7 +967,7 @@ MonoBehaviour:
   attackText: {fileID: 1991257668}
   rewindText: {fileID: 878314921}
   jumpText: {fileID: 1927579444}
-  idleTimeThreshold: 5
+  idleTimeThreshold: 2
 --- !u!4 &898589882
 Transform:
   m_ObjectHideFlags: 0
@@ -1211,6 +1211,7 @@ GameObject:
   - component: {fileID: 1373591022}
   - component: {fileID: 1373591023}
   - component: {fileID: 1373591024}
+  - component: {fileID: 1373591025}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -1306,15 +1307,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 1373591017}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 72299dbe5625e414290411fef5452eab, type: 3}
+  m_Script: {fileID: 11500000, guid: eaafb7039bb85bf4cb0ba1ffc4c87793, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
+  moveSpeed: 5
+  jumpForce: 10
+  horizontalInput: 0
+  groundCheck: {fileID: 2026884031}
+  groundCheckRadius: 0.35
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  isGrounded: 0
+  jumpBufferTime: 0.1
   tutorialManager: {fileID: 898589881}
-  player: {fileID: 1373591023}
-  maxHealth: 100
-  currentHealth: 0
-  moveSpeed: 3
-  attackLunge: 1
 --- !u!50 &1373591021
 Rigidbody2D:
   serializedVersion: 5
@@ -1409,6 +1415,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   isGrounded: 1
+  jumpBufferTime: 0.1
+  tutorialManager: {fileID: 898589881}
 --- !u!114 &1373591024
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1539,6 +1547,19 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
+--- !u!114 &1373591025
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1373591017}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 211c6077ecb9a24478f394aa8e4889f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TimeRewind.PlayerRewindController
+  rewindKey: 32
 --- !u!1 &1454794536
 GameObject:
   m_ObjectHideFlags: 0
