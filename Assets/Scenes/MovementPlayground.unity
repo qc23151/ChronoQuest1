@@ -16756,6 +16756,7 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.120744705, y: 0.0063605793}
   m_EdgeRadius: 0
+
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
