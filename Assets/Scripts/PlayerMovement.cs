@@ -17,7 +17,7 @@ public class PlayerPlatformer : MonoBehaviour
     [SerializeField] private Transform groundCheck;
     [SerializeField] private float groundCheckRadius = 0.2f;
     [SerializeField] private LayerMask groundLayer;
-    private bool isGrounded;
+    public bool isGrounded;
     
     [Header("Jump Buffer")]
     [SerializeField] private float jumpBufferTime = 0.1f;
