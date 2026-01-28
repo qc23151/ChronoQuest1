@@ -53,8 +53,8 @@ public class PlayerPlatformer : MonoBehaviour
             anim.SetBool("isGrounded", isGrounded);
         }
         
-        // Handle Jump Logic
-        if (jumpPressed && isGrounded)
+        // Jump Logic
+        if (jumpPressed)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
             jumpPressed = false; // Reset to prevent double jumping
@@ -81,7 +81,7 @@ public class PlayerPlatformer : MonoBehaviour
     // Called by Player Input Component (Jump Action)
     public void OnJump(InputAction.CallbackContext context)
     {
-        if (context.performed)
+        if (context.performed && isGrounded)
             jumpPressed = true;
     }
 
