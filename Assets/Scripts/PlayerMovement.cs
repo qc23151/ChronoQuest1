@@ -34,6 +34,12 @@ public class PlayerPlatformer : MonoBehaviour
     {
         rb.linearVelocity = new Vector2(horizontalInput * moveSpeed, rb.linearVelocity.y);
     }
+
+    // New method for testing
+    public void Jump()
+    {
+        jumpPressed = true;
+    }
     public void OnMove(InputAction.CallbackContext context)
     {
         horizontalInput = context.ReadValue<Vector2>().x;
@@ -41,6 +47,6 @@ public class PlayerPlatformer : MonoBehaviour
     public void OnJump(InputAction.CallbackContext context)
     {
         if (context.performed)
-            jumpPressed = true;
+            Jump();
     }
 }
