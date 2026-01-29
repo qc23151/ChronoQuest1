@@ -22,6 +22,7 @@ public class TutorialManager : MonoBehaviour
     public GameObject jumpHint; 
 
     public PlayerPlatformer player;
+    public PlayerHealth playerHealth;
     public Transform enemy;
     public Transform platform; 
     public float attackDistance = 5f;
@@ -58,6 +59,11 @@ public class TutorialManager : MonoBehaviour
         lastPlayerPosition = player.transform.position;
         
         DisableHints();
+
+        if (playerHealth != null)
+        {
+            playerHealth.OnHealthChanged += HandleHealthChanged;
+        }
     }
 
     void Update()
@@ -93,7 +99,7 @@ public class TutorialManager : MonoBehaviour
         if (jumpCompleted) return;
         if (!player.isGrounded) return;
 
-        // perform idle and proximity check
+        // perform proximity check
         float movementDelta = Vector2.Distance(player.transform.position, lastPlayerPosition);
         if (movementDelta > 0.01f) return;
 
@@ -131,6 +137,14 @@ public class TutorialManager : MonoBehaviour
         }
 
         lastPlayerPosition = player.transform.position;
+    }
+
+    private void HandleHealthChanged(int current, int max)
+    {
+       if (current < max && !rewindCompleted)
+       {
+           SetStep(TutorialStep.Rewind);
+       }
     }
 
     public void OnPlayerMoved()
@@ -171,6 +185,20 @@ public class TutorialManager : MonoBehaviour
         jumpCompleted = true;
         jumpHint.SetActive(false); 
         Debug.Log("Player jump tutorial complete");
+    }
+
+    public void OnPlayerRewind()
+    {
+        if (currentStep != TutorialStep.Jump) return;
+        if (rewindCompleted) return;
+
+        if (playerHealth.CurrentHealth < playerHealth.MaxHealth)
+            return; 
+
+        rewindCompleted = true;
+        rewindHint.SetActive(false);
+        Debug.Log("Player rewind tutorial complete");
+           
     }
 
     // setting the current tutorial step and showing corresponding hint
