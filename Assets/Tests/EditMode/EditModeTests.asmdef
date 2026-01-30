@@ -3,6 +3,7 @@
     "rootNamespace": "",
     "references": [
         "TimeRewind",
+        "NewAssembly",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"
     ],

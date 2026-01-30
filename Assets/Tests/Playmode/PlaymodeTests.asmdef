@@ -5,7 +5,8 @@
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
         "NewAssembly",
-        "TimeRewind"
+        "TimeRewind",
+        "Unity.InputSystem"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
