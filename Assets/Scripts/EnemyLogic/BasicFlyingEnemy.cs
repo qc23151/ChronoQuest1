@@ -12,15 +12,14 @@ public class FlyingEnemy : MonoBehaviour
     public Transform player;
     public float hoverFrequency = 2f; // Bob speed
     public float hoverAmplitude = 0.5f; // Max bob height
+    public enum State { Sleeping, Idle, Chase, Attack }
+    public State currentState = State.Idle;
 
     private float lastAttackTime;
     private Rigidbody2D rb;
     private Vector3 originalScale;
     private Vector2 movement; // Store movement to apply in FixedUpdate
     private Collider2D playerCollider;
-    
-    private enum State { Idle, Chase, Attack }
-    private State currentState = State.Idle;
     private Animator animator;
     private bool isTouchingPlayer = false;
 
@@ -30,6 +29,7 @@ public class FlyingEnemy : MonoBehaviour
         originalScale = transform.localScale;
         playerCollider = player.GetComponent<Collider2D>();
         animator = GetComponent<Animator>();
+        animator.ResetTrigger("Chase");
         animator.ResetTrigger("Attack");
     }
 
@@ -43,10 +43,15 @@ void Update()
         }
         else if (distanceToPlayer > detectionRange)
         {
-            currentState = State.Idle;
+            // If the enemy is sleeping and outside range, continue to sleep
+            if (currentState == State.Sleeping) currentState = State.Sleeping;
+            // If awake, continue to be awake
+            else currentState = State.Idle;
         }
         else
         {
+            // If enemy has awoken, increase detection range
+            if (currentState == State.Sleeping) detectionRange += (float)2;
             currentState = State.Chase;
         }
 
@@ -75,6 +80,8 @@ void Update()
     {
         switch (currentState)
         {
+            case State.Sleeping:
+                break;
             case State.Idle:
                 Hover();
                 break;
@@ -98,6 +105,7 @@ void Update()
 
     void Chase()
     {
+        animator.SetTrigger("Chase");
         // Enemy's body type should be kinematic - different movement system  
         Vector2 newPosition = Vector2.MoveTowards(rb.position, playerCollider.bounds.center, moveSpeed * Time.fixedDeltaTime);
         rb.MovePosition(newPosition);
