@@ -1,6 +1,6 @@
 using UnityEngine;
-
-public class FlyingEnemy : MonoBehaviour
+using TimeRewind;
+public class FlyingEnemy : MonoBehaviour, IRewindable
 {
     public float detectionRange = 10f;
     public float attackRange = 1f;
@@ -22,6 +22,9 @@ public class FlyingEnemy : MonoBehaviour
     private Collider2D playerCollider;
     private Animator animator;
     private bool isTouchingPlayer = false;
+    private RigidbodyType2D _originalBodyType;
+    private RewindState _lastAppliedState;
+    private bool _isRewinding;
 
     void Start()
     {
@@ -33,8 +36,25 @@ public class FlyingEnemy : MonoBehaviour
         animator.ResetTrigger("Attack");
     }
 
+    private void OnEnable()
+    {
+        if (TimeRewindManager.Instance != null)
+        {
+            TimeRewindManager.Instance.Register(this);
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (TimeRewindManager.Instance != null)
+        {
+            TimeRewindManager.Instance.Unregister(this);
+        }
+    }
+
 void Update()
     {
+        if (_isRewinding) return;
         float distanceToPlayer = Vector2.Distance(transform.position, playerCollider.bounds.center);
 
         if (isTouchingPlayer) 
@@ -78,6 +98,7 @@ void Update()
 
     void FixedUpdate()
     {
+        if (_isRewinding) return;
         switch (currentState)
         {
             case State.Sleeping:
@@ -150,5 +171,71 @@ void Update()
     {
         Debug.Log("Enemy died!");
         Destroy(gameObject);
+    }
+
+    public void OnStartRewind()
+    {
+        _isRewinding = true; // Sets the flag that stops Update/FixedUpdate
+
+        // Make Rigidbody Kinematic so physics doesn't interfere
+        if (rb == null) rb = GetComponent<Rigidbody2D>();
+        _originalBodyType = rb.bodyType;
+        rb.bodyType = RigidbodyType2D.Kinematic;
+        rb.linearVelocity = Vector2.zero;
+        rb.angularVelocity = 0f;
+    }
+
+    public void OnStopRewind()
+    {
+        _isRewinding = false;
+
+        // Restore physics
+        rb.bodyType = _originalBodyType;
+
+        if (_originalBodyType == RigidbodyType2D.Dynamic)
+        {
+            rb.linearVelocity = _lastAppliedState.Velocity;
+            rb.angularVelocity = _lastAppliedState.AngularVelocity;
+        }
+        if(currentState == State.Chase) animator.SetTrigger("Chase");
+        else animator.ResetTrigger("Chase");
+    }
+
+public RewindState CaptureState()
+    {
+        // Create physics state
+        var state = RewindState.CreateWithPhysics(
+            transform.position,
+            transform.rotation,
+            (rb != null) ? rb.linearVelocity : Vector2.zero,
+            (rb != null) ? rb.angularVelocity : 0f,
+            Time.time
+        );
+
+        // Save data using Dictionary
+        state.Health = health;
+        state.SetCustomData("EnemyState", (int)currentState);
+        state.SetCustomData("DetectRange", detectionRange);
+
+        AnimatorStateInfo animInfo = animator.GetCurrentAnimatorStateInfo(0);
+        state.AnimatorStateHash = animInfo.shortNameHash;
+        state.AnimatorNormalizedTime = animInfo.normalizedTime;
+        
+        return state;
+    }
+
+    public void ApplyState(RewindState state)
+    {
+        transform.position = state.Position;
+        transform.rotation = state.Rotation;
+        _lastAppliedState = state;
+
+        health = state.Health;
+        
+        currentState = (State)state.GetCustomData<int>("EnemyState", (int)State.Idle);
+        
+        detectionRange = state.GetCustomData<float>("DetectRange", 10f);
+
+        animator.Play(state.AnimatorStateHash, 0, state.AnimatorNormalizedTime);
     }
 }
