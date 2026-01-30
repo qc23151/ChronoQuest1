@@ -46,6 +46,7 @@ public class PlayerPlatformer : MonoBehaviour
     [Header("Double Jump")]
     [SerializeField] private int extraJumps = 1; // Number of mid-air jumps allowed
     private int extraJumpsRemaining;
+    private BoxCollider2D playerCollider;
 
     private void Awake()
     {
@@ -54,6 +55,7 @@ public class PlayerPlatformer : MonoBehaviour
         // Auto-assign components if they weren't dragged into the Inspector
         if (anim == null) anim = GetComponent<Animator>();
         if (spriteRenderer == null) spriteRenderer = GetComponent<SpriteRenderer>();
+        playerCollider = GetComponent<BoxCollider2D>();
     }
 
     private void Update()
@@ -194,26 +196,27 @@ public class PlayerPlatformer : MonoBehaviour
         canDash = true;
     }
 
-    void FlipSprite()
+void FlipSprite()
 {
-    bool isMovingLeft = horizontalInput < -0.1f;
-    bool isMovingRight = horizontalInput > 0.1f;
-
-    if (isMovingRight && spriteRenderer.flipX)
+    if (horizontalInput > 0.1f)
     {
         spriteRenderer.flipX = false;
-        // Flip the WallCheck position to the right side
-        Vector3 newPos = wallCheck.localPosition;
-        newPos.x = Mathf.Abs(newPos.x); 
-        wallCheck.localPosition = newPos;
+        // If 0.08 was "too right," try half that distance
+        playerCollider.offset = new Vector2(-0.06f, 0.007f); 
+        
+        // Match sensors to the new body center
+        wallCheck.localPosition = new Vector2(0.3f, 0.8f); 
+        //groundCheck.localPosition = new Vector2(0.04f, 0f);
     }
-    else if (isMovingLeft && !spriteRenderer.flipX)
+    else if (horizontalInput < -0.1f)
     {
         spriteRenderer.flipX = true;
-        // Flip the WallCheck position to the left side
-        Vector3 newPos = wallCheck.localPosition;
-        newPos.x = -Mathf.Abs(newPos.x); 
-        wallCheck.localPosition = newPos;
+        // If left was "too left," move it closer to zero (e.g., -0.01)
+        playerCollider.offset = new Vector2(0.05f, 0.007f); 
+
+        // Match sensors to the new body center
+        wallCheck.localPosition = new Vector2(-0.3f, 0.8f);
+        //groundCheck.localPosition = new Vector2(-0.01f, 0f);
     }
 }
 
