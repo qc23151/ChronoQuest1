@@ -216,6 +216,7 @@ public RewindState CaptureState()
         state.Health = health;
         state.SetCustomData("EnemyState", (int)currentState);
         state.SetCustomData("DetectRange", detectionRange);
+        state.SetCustomData("FacingDirection", transform.localScale);
 
         AnimatorStateInfo animInfo = animator.GetCurrentAnimatorStateInfo(0);
         state.AnimatorStateHash = animInfo.shortNameHash;
@@ -235,6 +236,8 @@ public RewindState CaptureState()
         currentState = (State)state.GetCustomData<int>("EnemyState", (int)State.Idle);
         
         detectionRange = state.GetCustomData<float>("DetectRange", 10f);
+
+        transform.localScale = state.GetCustomData<Vector3>("FacingDirection", new Vector3(-Mathf.Abs(originalScale.x), originalScale.y, originalScale.z));
 
         animator.Play(state.AnimatorStateHash, 0, state.AnimatorNormalizedTime);
     }
