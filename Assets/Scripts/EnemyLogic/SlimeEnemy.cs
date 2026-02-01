@@ -1,6 +1,7 @@
 using UnityEngine;
+using TimeRewind;
 
-public class SlimeEnemy : MonoBehaviour
+public class SlimeEnemy : MonoBehaviour, IRewindable
 {
     [Header("Stats")]
     public float detectionRange = 5f;
@@ -11,7 +12,7 @@ public class SlimeEnemy : MonoBehaviour
     public int health = 3;
 
     [Header("Hop Settings")]
-    public float hopForce = 4f;
+    public float hopForce = 3f;
     public float hopCooldown = 1f;
 
     public Transform player;
@@ -21,24 +22,43 @@ public class SlimeEnemy : MonoBehaviour
     private Vector3 originalScale;
     private Animator animator;
     private Rigidbody2D rb;
+    private SpriteRenderer spriteRenderer;
     private bool playerInContact = false;
     private bool isGrounded = false;
-    private SpriteRenderer spriteRenderer;
 
+    // Rewind
+    private bool isRewinding = false;
+    private RigidbodyType2D originalBodyType;
+    private bool wasDead = false;
 
     private enum State { Idle, Chase, Attack }
     private State currentState = State.Idle;
 
     void Start()
     {
-    originalScale = transform.localScale;
-    animator = GetComponent<Animator>();
-    rb = GetComponent<Rigidbody2D>();
-    spriteRenderer = GetComponent<SpriteRenderer>();
+        originalScale = transform.localScale;
+        animator = GetComponent<Animator>();
+        rb = GetComponent<Rigidbody2D>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
+    }
+
+    void OnEnable()
+    {
+        TimeRewindManager.Instance.Register(this);
+    }
+
+    void OnDisable()
+    {
+        if (TimeRewindManager.Instance != null)
+        {
+            TimeRewindManager.Instance.Unregister(this);
+        }
     }
 
     void Update()
     {
+        // Don't run AI during rewind
+        if (isRewinding) return;
         if (player == null) return;
 
         float distanceToPlayer = Vector2.Distance(transform.position, player.position);
@@ -65,30 +85,25 @@ public class SlimeEnemy : MonoBehaviour
                 break;
         }
 
-        // Always sync animation with ground state
         animator.SetBool("isHopping", !isGrounded && currentState == State.Chase);
     }
 
-    void Idle()
-    {
-    }
+    void Idle() { }
 
     void Chase()
     {
-    Vector2 direction = (player.position - transform.position).normalized;
-    
-    // Flip sprite to face player
-    if (direction.x > 0)
-        spriteRenderer.flipX = false;
-    else if (direction.x < 0)
-        spriteRenderer.flipX = true;
+        Vector2 direction = (player.position - transform.position).normalized;
 
-    // Hop toward player
-    if (isGrounded && Time.time >= lastHopTime + hopCooldown)
+        if (direction.x > 0)
+            spriteRenderer.flipX = false;
+        else if (direction.x < 0)
+            spriteRenderer.flipX = true;
+
+        if (isGrounded && Time.time >= lastHopTime + hopCooldown)
         {
-        rb.linearVelocity = new Vector2(direction.x * moveSpeed, hopForce);
-        lastHopTime = Time.time;
-        isGrounded = false;
+            rb.linearVelocity = new Vector2(direction.x * moveSpeed, hopForce);
+            lastHopTime = Time.time;
+            isGrounded = false;
         }
     }
 
@@ -114,11 +129,9 @@ public class SlimeEnemy : MonoBehaviour
             playerInContact = true;
         }
 
-        // Check if landed on ground
         if (collision.contacts[0].normal.y > 0.5f)
         {
             isGrounded = true;
-            animator.SetBool("isHopping", false);
         }
     }
 
@@ -143,9 +156,73 @@ public class SlimeEnemy : MonoBehaviour
 
     void Die()
     {
+        wasDead = true;
         animator.SetTrigger("die");
         enabled = false;
         rb.linearVelocity = Vector2.zero;
         Destroy(gameObject, 0.6f);
+    }
+
+    // ---- IRewindable Implementation ----
+
+    public void OnStartRewind()
+    {
+        isRewinding = true;
+        originalBodyType = rb.bodyType;
+        rb.bodyType = RigidbodyType2D.Kinematic;
+        rb.linearVelocity = Vector2.zero;
+        rb.angularVelocity = 0f;
+
+        // Cancel any pending destroy
+        CancelInvoke();
+
+        // Re-enable if we were dead
+        if (!enabled)
+        {
+            enabled = true;
+            wasDead = false;
+        }
+    }
+
+    public void OnStopRewind()
+    {
+        isRewinding = false;
+        rb.bodyType = originalBodyType;
+    }
+
+    public RewindState CaptureState()
+    {
+        var state = RewindState.CreateWithPhysics(
+            transform.position,
+            transform.rotation,
+            rb.linearVelocity,
+            rb.angularVelocity,
+            Time.time
+        );
+
+        state.Health = health;
+        state.SetCustomData("flipX", spriteRenderer.flipX);
+        state.SetCustomData("isGrounded", isGrounded);
+
+        // Save animator state
+        var animState = animator.GetCurrentAnimatorStateInfo(0);
+        state.AnimatorStateHash = animState.fullPathHash;
+        state.AnimatorNormalizedTime = animState.normalizedTime;
+
+        return state;
+    }
+
+    public void ApplyState(RewindState state)
+    {
+        transform.position = state.Position;
+        transform.rotation = state.Rotation;
+        health = state.Health;
+
+        spriteRenderer.flipX = state.GetCustomData<bool>("flipX");
+        isGrounded = state.GetCustomData<bool>("isGrounded");
+
+        // Restore animation
+        animator.Play(state.AnimatorStateHash, 0, state.AnimatorNormalizedTime);
+        animator.Update(0f);
     }
 }
