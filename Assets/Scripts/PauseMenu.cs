@@ -15,6 +15,12 @@ public class PauseMenu : MonoBehaviour
         }
     }
 
+    public void PauseButton()
+    {
+        container.SetActive(true);
+        Time.timeScale = 0f;    // Pause the game
+    }
+
     public void ResumeButton()
     {
         container.SetActive(false);
