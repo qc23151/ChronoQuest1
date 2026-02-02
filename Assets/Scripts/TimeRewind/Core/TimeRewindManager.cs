@@ -255,6 +255,9 @@ namespace TimeRewind
         {
             if (!_isRewinding)
                 return;
+
+            if (PauseMenu.isPaused)
+                return;
             
             _isRewinding = false;
 
@@ -330,6 +333,9 @@ namespace TimeRewind
         
         private void UpdateRewind()
         {
+            if (PauseMenu.isPaused)
+                return; 
+            
             _currentRewindTime -= Time.deltaTime * rewindSpeed;
             
             float oldestTime = GetOldestRecordedTime();

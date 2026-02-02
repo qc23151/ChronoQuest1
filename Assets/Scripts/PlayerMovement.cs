@@ -80,6 +80,9 @@ public class PlayerPlatformer : MonoBehaviour
     {
         if (PauseMenu.isPaused)
             return;
+        
+        if (TimeRewindManager.Instance != null && TimeRewindManager.Instance.IsRewinding)
+            return;
 
         horizontalInput = context.ReadValue<Vector2>().x;
     }
@@ -87,6 +90,9 @@ public class PlayerPlatformer : MonoBehaviour
     public void OnJump(InputAction.CallbackContext context)
     {
         if (PauseMenu.isPaused)
+            return;
+
+        if (TimeRewindManager.Instance != null && TimeRewindManager.Instance.IsRewinding)
             return;
 
         if (context.performed)
