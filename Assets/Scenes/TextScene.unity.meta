@@ -1,8 +1,7 @@
 fileFormatVersion: 2
-guid: 9a14a8a1184c5f14fbce3338ea4d7a35
-NativeFormatImporter:
+guid: 8c9cfa26abfee488c85f1582747f6a02
+DefaultImporter:
   externalObjects: {}
-  mainObjectFileID: 11400000
   userData: 
   assetBundleName: 
   assetBundleVariant: 
@@ -11,5 +10,5 @@ AssetOrigin:
   productId: 332078
   packageName: BoldPixels
   packageVersion: 1.5.0
-  assetPath: Assets/BoldPixels/Assets/font/BoldPixels SDF.asset
+  assetPath: Assets/Scenes/TextScene.unity
   uploadId: 785910

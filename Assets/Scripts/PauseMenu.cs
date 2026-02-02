@@ -1,9 +1,11 @@
 using UnityEngine;
+using UnityEngine.SceneManagement; 
 
 public class PauseMenu : MonoBehaviour
 {
     public GameObject container; 
     public static bool isPaused = false;
+    public int escapePressed = 0;
     
     void Update()
     {
@@ -13,6 +15,7 @@ public class PauseMenu : MonoBehaviour
             isPaused = !isPaused;
             container.SetActive(isPaused);
             Time.timeScale = isPaused ? 0f : 1f;
+            escapePressed += 1; 
         }
     }
 
@@ -32,6 +35,14 @@ public class PauseMenu : MonoBehaviour
 
     public void MainMenuButton()
     {
-        // TODO: navigate to starting screen
+        isPaused = false; 
+        Time.timeScale = 1f;
+
+        if (container != null)
+        {
+            container.SetActive(false); 
+        }
+
+        SceneManager.LoadScene("TitleScreen"); 
     }
 }
