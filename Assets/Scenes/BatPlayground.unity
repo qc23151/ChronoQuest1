@@ -2724,6 +2724,10 @@ PrefabInstance:
       propertyPath: m_Tiles.Array.data[22].second.m_TileSpriteIndex
       value: 24
       objectReference: {fileID: 0}
+    - target: {fileID: 6062126879299625239, guid: 6fefbb076a560f34db23e13239278ac9, type: 3}
+      propertyPath: m_GeometryType
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7047778695999147764, guid: 6fefbb076a560f34db23e13239278ac9, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

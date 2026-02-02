@@ -14,12 +14,16 @@ public class BatAgent : Agent
     private Vector3 startPos;
     
     public float moveSpeed = 5f;
+    private Animator animator;
 
     public override void Initialize()
     {
         rb = GetComponent<Rigidbody2D>();
         startPos = transform.position;
         playerCollider = player.GetComponent<Collider2D>();
+        animator = GetComponent<Animator>();
+        animator.ResetTrigger("Chase");
+        animator.ResetTrigger("Attack");
     }
 
     public override void OnEpisodeBegin()
