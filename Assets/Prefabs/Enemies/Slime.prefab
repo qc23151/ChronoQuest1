@@ -32,7 +32,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 2.7601, y: 0.27, z: 0}
   m_LocalScale: {x: 0.7382, y: 0.6337, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -133,7 +133,7 @@ Rigidbody2D:
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_GravityScale: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 1a2bfbc833ac8534cad1c778965f9d77, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -199,6 +199,11 @@ MonoBehaviour:
   attackCooldown: 1.5
   damage: 1
   health: 3
-  hopForce: 3
+  hopForce: 5
   hopCooldown: 1
+  animationSpeed: 0.1
+  currentVelocityY: 0
+  currentFrameIndex: 0
+  currentStateLabel: 
+  degugground: 0
   player: {fileID: 0}
