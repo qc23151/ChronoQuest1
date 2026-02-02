@@ -41,7 +41,6 @@ public class TutorialHintController : MonoBehaviour
             tutorialManager.OnPlayerAttack();
         }
 
-        // placeholder until attack logic is implemented
         Debug.Log("Player Attacked");
     }
 
@@ -60,7 +59,7 @@ public class TutorialHintController : MonoBehaviour
             currentHealth = 0;
             Debug.Log("Player Defeated");
 
-            // player defeat logic, try again screen? function to deal with this?
+            // player defeat logic, game over
         }
 
         if (!lowHealthWarningShown && currentHealth <= maxHealth * 0.3f)
