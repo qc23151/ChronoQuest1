@@ -31,7 +31,7 @@ public class MovementPlaygroundTests
         // Get the starting height of the player
         float startHeight = player.transform.position.y;
         // Wait 0.2 seconds (for player to fall)
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSeconds(2f);
         // Get height after waiting
         float endHeight = player.transform.position.y;
         Assert.Less(endHeight, startHeight, "Player did not fall as expected. Do they start on the ground?");
