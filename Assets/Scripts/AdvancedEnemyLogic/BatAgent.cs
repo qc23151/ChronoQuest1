@@ -66,9 +66,16 @@ public class BatEnemyAI : Agent, IRewindable
     {
         if (trainingMode)
         {
-            // Start bat in a random position every time
-            transform.position = startPos + (Vector3)Random.insideUnitCircle * 2f;
+            // Start bat in a random position every time, in the air
+            float randBatX = Random.Range(-10f, 10f);
+            transform.position = new Vector2(randBatX, 2f);
             rb.linearVelocity = Vector2.zero;
+
+            // Spawn the player in a random position, just above the floor
+            Rigidbody2D playerRb = player.GetComponent<Rigidbody2D>();
+            playerRb.linearVelocity = Vector2.zero;
+            float randPlayerX = Random.Range(-10f, 10f);
+            player.position = new Vector2(randPlayerX, -7f);
         }
     }
 
@@ -116,6 +123,14 @@ public class BatEnemyAI : Agent, IRewindable
         {
             // Make sure speed is taken into account (longer, less reward)
             AddReward(-0.001f);
+            // Reset and punish if bat gets too far away
+            if(distToPlayer > 15f)
+            {
+                AddReward(-0.5f);
+                EndEpisode();
+                return;
+            }
+            
         }
     }
     void Hover()
