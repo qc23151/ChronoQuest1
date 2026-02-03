@@ -1,7 +1,9 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections;
+using TimeRewind;
 
+[RequireComponent(typeof(PlayerRewindController))]
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerPlatformer : MonoBehaviour
 {
@@ -73,6 +75,7 @@ public class PlayerPlatformer : MonoBehaviour
 
     private void Update()
     {
+        if (TimeRewindManager.Instance != null && TimeRewindManager.Instance.IsRewinding) return;
         FlipSprite();
         if (isDashing) return;
         // Check if feet are touching the ground layer
@@ -156,6 +159,8 @@ public class PlayerPlatformer : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (TimeRewindManager.Instance != null && TimeRewindManager.Instance.IsRewinding) return;
+
         if (isDashing || isWallSliding || isWallJumping) return;
         // Apply horizontal movement while preserving falling/jumping speed
         rb.linearVelocity = new Vector2(horizontalInput * moveSpeed, rb.linearVelocity.y);
