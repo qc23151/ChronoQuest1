@@ -287,6 +287,10 @@ public class PlayerPlatformer : MonoBehaviour
 
         // Apply dash velocity based on the direction the player is facing
         float dashDirection = spriteRenderer.flipX ? -1f : 1f;
+        if (isWallSliding)
+        {
+            dashDirection = dashDirection*(-1);
+        }
         rb.linearVelocity = new Vector2(dashDirection * dashSpeed, 0f);
 
         if (anim != null) anim.SetTrigger("Dash");
