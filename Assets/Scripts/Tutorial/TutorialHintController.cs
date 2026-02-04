@@ -14,7 +14,7 @@ public class TutorialHintController : MonoBehaviour
     public float attackLunge = 1f; 
 
     private bool moveTriggered;
-    // private bool jumpTriggered;          for when jumping movement is added to tutorial
+    private bool jumpTriggered;          
     
     void Start()
     {
@@ -27,13 +27,7 @@ public class TutorialHintController : MonoBehaviour
         {
             moveTriggered = true;
             tutorialManager?.OnPlayerMoved();
-        }
-
-        /* if (!jumpTriggered && !player.isGrounded)
-        {
-            jumpTriggered = true;
-            tutorialManager?.OnPlayerJumped();
-        } */ 
+        } 
     }
 
     void StartAttack()
@@ -47,7 +41,6 @@ public class TutorialHintController : MonoBehaviour
             tutorialManager.OnPlayerAttack();
         }
 
-        // placeholder until attack logic is implemented
         Debug.Log("Player Attacked");
     }
 
@@ -57,6 +50,7 @@ public class TutorialHintController : MonoBehaviour
         transform.Translate(Vector2.right * attackLunge);
     }
 
+    // ** might be able to delete this ** 
     public void TakeDamage(int damage)
     {
         currentHealth -= damage;
@@ -65,7 +59,7 @@ public class TutorialHintController : MonoBehaviour
             currentHealth = 0;
             Debug.Log("Player Defeated");
 
-            // player defeat logic, try again screen? function to deal with this?
+            // player defeat logic, game over
         }
 
         if (!lowHealthWarningShown && currentHealth <= maxHealth * 0.3f)
@@ -73,22 +67,12 @@ public class TutorialHintController : MonoBehaviour
             lowHealthWarningShown = true;
             Debug.Log("Warning: Low Health!");
         }
-
-        if (currentHealth == 0)
-        {
-            GameOver();
-        }
-    }
-
-    void OnLowHealth()
-    {
-        // warning logic here
     }
 
     void TriggerRewind()
     {
         /* rewind logic here
-        if the player has been attacked or health is low etc., trigger the rewind effect
+        if the player health is low, trigger the rewind effect
         */
 
         if (tutorialManager != null)
@@ -98,12 +82,6 @@ public class TutorialHintController : MonoBehaviour
 
         // placeholder until rewind logic is implemented
         Debug.Log("Player Rewind Triggered");
-    }
-
-    void GameOver()
-    {
-        // game over logic here, likely to be a screen where the user can try again
-        Debug.Log("Game Over!"); 
     }
 }
 
