@@ -25,7 +25,7 @@ public class PlayerPlatformer : MonoBehaviour
     private bool isDashing;
 
     private Rigidbody2D rb;
-    private float horizontalInput;
+    public float horizontalInput;
     private bool jumpPressed;
 
     [Header("Visuals")]
@@ -36,7 +36,7 @@ public class PlayerPlatformer : MonoBehaviour
     [SerializeField] private Transform groundCheck;
     [SerializeField] private float groundCheckRadius = 0.2f;
     [SerializeField] private LayerMask groundLayer;
-    private bool isGrounded;
+    public bool isGrounded { get; private set; }
 
     [Header("Wall Slide")]
     [SerializeField] private Transform wallCheck;
@@ -221,6 +221,8 @@ public class PlayerPlatformer : MonoBehaviour
         isWallJumping = true; // Use this to ignore OnMove input in FixedUpdate
         wallCoyoteTimeCounter = 0; // Use it up immediately
 
+        wallJumpLockoutCounter = wallJumpLockoutTime;
+
         float jumpDirection = spriteRenderer.flipX ? 1f : -1f;
         rb.linearVelocity = new Vector2(jumpDirection * wallJumpPower.x, wallJumpPower.y);
 
@@ -286,5 +288,10 @@ public class PlayerPlatformer : MonoBehaviour
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
         }
+    }
+
+    public void TriggerJumpTest()
+    {
+        jumpBufferCounter = jumpBufferTime;
     }
 }

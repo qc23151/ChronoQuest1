@@ -65,7 +65,7 @@ public class MovementPlaygroundTests
         // Assert that the ground check is actually working
         Assert.IsTrue(controller.isGrounded, "Player should eventually be settled on the ground, but was not");
 
-        controller.Jump();
+        controller.TriggerJumpTest();
 
         yield return null; 
 
