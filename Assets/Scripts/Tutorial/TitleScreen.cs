@@ -24,7 +24,6 @@ public class TitleScreen : MonoBehaviour
 
     public void StartButton()
     {
-        // will change when the main level design is being used
-        SceneManager.LoadScene("MovementPlayground"); 
+        SceneManager.LoadScene("GameScene"); 
     }
 }

@@ -21,6 +21,7 @@ public class PauseMenu : MonoBehaviour
 
     public void PauseButton()
     {
+        Debug.Log("pause button pressed");
         container.SetActive(true);
         Time.timeScale = 0f;    
         isPaused = true; 
@@ -28,6 +29,7 @@ public class PauseMenu : MonoBehaviour
 
     public void ResumeButton()
     {
+        Debug.Log("resume button pressed");
         container.SetActive(false);
         Time.timeScale = 1f;    
         isPaused = false;
@@ -44,5 +46,10 @@ public class PauseMenu : MonoBehaviour
         }
 
         SceneManager.LoadScene("TitleScreen"); 
+    }
+
+    public void RestartButton()
+    {
+        // placeholder for logic
     }
 }
