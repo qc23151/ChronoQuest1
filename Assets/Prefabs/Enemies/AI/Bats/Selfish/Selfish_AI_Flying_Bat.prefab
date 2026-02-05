@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: 8605598908534411275}
   - component: {fileID: 535482973285320641}
   m_Layer: 0
-  m_Name: AI_Flying_Bat
+  m_Name: Selfish_AI_Flying_Bat
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

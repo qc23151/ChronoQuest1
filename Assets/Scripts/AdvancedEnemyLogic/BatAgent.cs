@@ -70,20 +70,27 @@ public class BatEnemyAI : Agent, IRewindable
     {
         if (trainingMode)
         {
+            // Disable gravity
+            rb.gravityScale = 0f;
             // Start bat in a random position every time, in the air
-            float randBatX = Random.Range(-10f, 10f);
-            transform.position = new Vector2(randBatX, 2f);
+            float randBatX = Random.Range(-6f, 14f);
+            float randBatY = Random.Range(1f, 6f);
+            transform.localPosition = new Vector2(randBatX, randBatY);
             rb.linearVelocity = Vector2.zero;
 
             // Spawn the player in a random position, just above the floor
             Rigidbody2D playerRb = player.GetComponent<Rigidbody2D>();
+            playerRb.gravityScale = 0f; 
             playerRb.linearVelocity = Vector2.zero;
-            float randPlayerX = Random.Range(-10f, 10f);
-            player.position = new Vector2(randPlayerX, -7f);
+            playerRb.angularVelocity = 0f;
+            float randPlayerX = Random.Range(-6f, 14f);
+            // Player height slightly skewed to bottom, as that is most common
+            float randPlayerY = Random.Range(1f, 6f);
+            player.localPosition = new Vector2(randPlayerX, randPlayerY);
 
             // Move the obstacle to a random location
-            float randX = Random.Range(-5f, 5f);
-            float randY = Random.Range(-2f, 2f);
+            float randX = Random.Range(-6f, 10f);
+            float randY = Random.Range(1f, 6f);
             // 50% chance to flip obstacle
             Vector3 newScale = obstacle.localScale;
             if (randY <= 0) {
@@ -133,9 +140,10 @@ public class BatEnemyAI : Agent, IRewindable
         currentState = State.Chase;
 
         float moveX = actions.ContinuousActions[0];
-        float moveY = actions.ContinuousActions[1];        
-        Vector2 movement = new Vector2(moveX, moveY) * moveSpeed * Time.deltaTime;
-        rb.MovePosition(rb.position + movement);
+        float moveY = actions.ContinuousActions[1];
+
+        Vector2 dir = new Vector2(moveX, moveY);
+        rb.linearVelocity = dir * moveSpeed;
 
         FacePlayer();
         animator.SetTrigger("Chase");
