@@ -28,7 +28,6 @@ public class TutorialManager : MonoBehaviour
     public PlayerPlatformer player;
     public PlayerHealth playerHealth;
     public Transform enemy;
-    public Transform platform; 
 
     // jump and attack distance are used to check proximity to objects like the enemy or platform
     // once close enough, hints for attack and jump will trigger
@@ -57,7 +56,7 @@ public class TutorialManager : MonoBehaviour
     [SerializeField] float idleTimeThreshold = 2f;
     float idleTimer = 0f;
     Vector2 lastPlayerPosition;
-    [SerializeField] private float movementGracePeriod = 6f; 
+    [SerializeField] private float movementGracePeriod = 4f; 
     private float gameStartTime; 
 
     private int hitCount = 0; 
@@ -91,11 +90,9 @@ public class TutorialManager : MonoBehaviour
         /* on every update, check if the player: 
         - ... is idle (movement check)
         - ... and enemy are close together (attack check)
-        - ... is close enough to trigger the jump hint
         */ 
         CheckPlayerIdle();
         CheckAttackDistance();
-        CheckJumpPrompt();
         
         // if all hints have been completed, tutorial completed 
         if (moveCompleted && attackCompleted && rewindCompleted && jumpCompleted && rewindCompleted && dashCompleted)
@@ -118,22 +115,6 @@ public class TutorialManager : MonoBehaviour
         {
             SetStep(TutorialStep.Attack);
         }
-    }
-
-    // checks the distance between the platform and the player 
-   void CheckJumpPrompt()
-    {
-        if (jumpCompleted) return;
-        if (!player.isGrounded) return;
-
-        // perform proximity check 
-        float movementDelta = Vector2.Distance(player.transform.position, lastPlayerPosition);
-        if (movementDelta > 0.01f) return;
-        
-        float distance = Vector2.Distance(player.transform.position, platform.position);
-        if (distance > jumpDistance) return;
-
-        SetStep(TutorialStep.Jump);
     }
 
     // checks if the player has been idle for the first n seconds of the game to trigger 
@@ -160,6 +141,14 @@ public class TutorialManager : MonoBehaviour
         }
 
         lastPlayerPosition = player.transform.position;
+    }
+
+    public void TriggerJumpHint()
+    {
+        if (jumpCompleted) return;
+        if (currentStep == TutorialStep.Jump) return; 
+
+        SetStep(TutorialStep.Jump); 
     }
 
     // handles when the health changes, triggers either the rewind or dash hint 
@@ -219,12 +208,12 @@ public class TutorialManager : MonoBehaviour
 
     public void OnPlayerJump()
     {
-        if (currentStep != TutorialStep.Jump) return;
-        if (jumpCompleted) return;
-
-        jumpCompleted = true;
-        jumpHint.SetActive(false); 
-        Debug.Log("Player jump tutorial complete");
+        if (currentStep == TutorialStep.Jump && !jumpCompleted)
+        {
+            jumpCompleted = true;
+            jumpHint.SetActive(false); 
+            Debug.Log("Player jump tutorial complete"); 
+        }
     }
 
     public void OnPlayerRewind()

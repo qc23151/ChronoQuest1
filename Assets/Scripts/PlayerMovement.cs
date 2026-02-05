@@ -260,6 +260,8 @@ public class PlayerPlatformer : MonoBehaviour
             anim.ResetTrigger("Dash"); // Clear dash so it doesn't fire after jump
             anim.SetTrigger("Jump");
         }
+
+        tutorialManager?.OnPlayerJump(); 
     }
 
     public void OnDash(InputAction.CallbackContext context)
