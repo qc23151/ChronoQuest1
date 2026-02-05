@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -17,6 +18,8 @@ namespace TimeRewind
         private RewindState _lastAppliedState;
         
         public bool IsRewinding => _isRewinding;
+        public event Action OnRewindStarted;
+        public event Action OnRewindStopped;
         
         #region Unity Lifecycle
         
@@ -83,6 +86,7 @@ namespace TimeRewind
         public void OnStartRewind()
         {
             _isRewinding = true;
+            OnRewindStarted?.Invoke();
             _originalBodyType = _rb.bodyType;
             _rb.bodyType = RigidbodyType2D.Kinematic;
             _rb.linearVelocity = Vector2.zero;
@@ -92,6 +96,7 @@ namespace TimeRewind
         public void OnStopRewind()
         {
             _isRewinding = false;
+            OnRewindStopped?.Invoke();
             _rb.bodyType = _originalBodyType;
             
             if (_originalBodyType == RigidbodyType2D.Dynamic)
