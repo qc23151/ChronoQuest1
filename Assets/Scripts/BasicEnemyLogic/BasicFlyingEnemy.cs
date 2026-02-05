@@ -71,7 +71,7 @@ void Update()
         else
         {
             // If enemy has awoken, increase detection range
-            if (currentState == State.Sleeping) detectionRange += (float)2;
+            if (currentState == State.Sleeping) if (currentState == State.Sleeping)
             currentState = State.Chase;
         }
 

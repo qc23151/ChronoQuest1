@@ -3,7 +3,6 @@ using UnityEngine;
 public class BasicEnemy : MonoBehaviour
 {
     public float detectionRange = 5f;
-    public float attackRange = 1f;
     public float moveSpeed = 2f;
     public float attackCooldown = 1.5f;
     public int damage = 1;
@@ -13,30 +12,30 @@ public class BasicEnemy : MonoBehaviour
 
     private float lastAttackTime;
     private Vector3 originalScale;
+    private Animator animator;
+    private bool playerInContact = false;
     private enum State { Idle, Chase, Attack }
     private State currentState = State.Idle;
 
     void Start()
     {
         originalScale = transform.localScale;
+        animator = GetComponent<Animator>();
     }
 
     void Update()
     {
+        if (player == null) return;
+
         float distanceToPlayer = Vector2.Distance(transform.position, player.position);
 
-        if (distanceToPlayer > detectionRange)
-        {
-            currentState = State.Idle;
-        }
-        else if (distanceToPlayer > attackRange)
-        {
-            currentState = State.Chase;
-        }
-        else
-        {
+        // Use collision for attack, distance for chase
+        if (playerInContact)
             currentState = State.Attack;
-        }
+        else if (distanceToPlayer < detectionRange)
+            currentState = State.Chase;
+        else
+            currentState = State.Idle;
 
         switch (currentState)
         {
@@ -52,16 +51,13 @@ public class BasicEnemy : MonoBehaviour
         }
     }
 
-    void Idle()
-    {
-    }
+    void Idle() { }
 
     void Chase()
     {
         Vector2 direction = (player.position - transform.position).normalized;
         transform.position += (Vector3)(direction * moveSpeed * Time.deltaTime);
 
-        // flip sprite while keeping original scale
         if (direction.x > 0)
             transform.localScale = new Vector3(Mathf.Abs(originalScale.x), originalScale.y, originalScale.z);
         else if (direction.x < 0)
@@ -80,6 +76,24 @@ public class BasicEnemy : MonoBehaviour
             {
                 playerHealth.ModifyHealth(-damage);
             }
+        }
+    }
+
+    // Called when colliders touch
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            playerInContact = true;
+        }
+    }
+
+    // Called when colliders separate
+    void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            playerInContact = false;
         }
     }
 
