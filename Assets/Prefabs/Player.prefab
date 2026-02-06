@@ -283,18 +283,40 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eaafb7039bb85bf4cb0ba1ffc4c87793, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerPlatformer
+  coyoteTime: 0.05
+  jumpBufferTime: 0.2
   moveSpeed: 5
   jumpForce: 12
-  extraJumps: 1
-  horizontalInput: 0
-  coyoteTime: 0.05
-  animationStepSpeed: 0.05
   totalJumpFrames: 8
   dashSpeed: 20
   dashDuration: 0.25
+  dashCooldown: 1
   dashPhaseLayers:
     serializedVersion: 2
     m_Bits: 9
+  horizontalInput: 0
+  anim: {fileID: 0}
+  spriteRenderer: {fileID: 0}
+  groundCheck: {fileID: 3547365591171035264}
+  groundCheckRadius: 0.2
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 256
+  wallSlideSpeed: 2
+  wallLayer:
+    serializedVersion: 2
+    m_Bits: 256
+  wallCheckDistance: 0.8
+  isTouchingWall: 0
+  isWallSliding: 0
+  extraJumps: 1
+  wallCoyoteTime: 0.15
+  wallJumpPower: {x: 10, y: 15}
+  wallJumpDuration: 0.2
+  wallJumpLockoutTime: 0.2
+  moveLeftKey: 15
+  moveRightKey: 18
+  jumpKey: 1
 --- !u!114 &340241791458222048
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -454,6 +476,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: NewAssembly::TimeRewind.PlayerRewindController
   rewindKey: 32
+  rewindHoldThreshold: 0
 --- !u!66 &2945315806622364923
 CompositeCollider2D:
   m_ObjectHideFlags: 0

@@ -43,11 +43,12 @@ public class PlayerPlatformer : MonoBehaviour
     public bool isGrounded { get; private set; }
 
     [Header("Wall Slide")]
-    [SerializeField] private Transform wallCheck;
+    // [SerializeField] private Transform wallCheck;
     [SerializeField] private float wallSlideSpeed = 2f;
-    [SerializeField] private LayerMask wallLayer; // can be = GroundLayer
-    private bool isTouchingWall;
-    private bool isWallSliding;
+    [SerializeField] private LayerMask wallLayer; 
+    [SerializeField] private float wallCheckDistance = 0.8f;
+    [SerializeField] private bool isTouchingWall;
+    [SerializeField] private bool isWallSliding;
 
     [Header("Double Jump")]
     [SerializeField] private int extraJumps = 1; // Number of mid-air jumps allowed
@@ -125,13 +126,23 @@ public class PlayerPlatformer : MonoBehaviour
         if (wallJumpLockoutCounter > 0) wallJumpLockoutCounter -= Time.deltaTime;
         if (jumpBufferCounter > 0) jumpBufferCounter -= Time.deltaTime;
 
-        float senseDirection = spriteRenderer.flipX ? -1f : 1f;
-        float wallDistance = 0.5f;
 
-        // This calculates the position manually, ignoring PPU/Child shifts
-        Vector3 manualWallCheckPos = transform.position + new Vector3(senseDirection * wallDistance, 0.8f, 0);
+        float direction = spriteRenderer.flipX ? -1f : 1f;
 
-        isTouchingWall = Physics2D.OverlapCircle(manualWallCheckPos, 0.45f, wallLayer);
+        // Raise the origin to "Chest Height" (e.g., +0.5f Y)
+        // This is CRITICAL: It ensures we don't hit the floor and think it's a wall.
+        Vector2 wallOrigin = new Vector2(transform.position.x, transform.position.y + 0.5f);
+
+        RaycastHit2D wallHit = Physics2D.Raycast(
+            wallOrigin, 
+            Vector2.right * direction, 
+            wallCheckDistance, 
+            groundLayer // Using the same layer!
+        );
+
+        isTouchingWall = wallHit.collider != null;
+
+        
 
         //if player is pushing towards wall -> actually slide
         bool isPushingWall = (horizontalInput > 0 && !spriteRenderer.flipX) || (horizontalInput < 0 && spriteRenderer.flipX);
@@ -238,7 +249,7 @@ public class PlayerPlatformer : MonoBehaviour
         {
             anim.SetBool("isGrounded", true); 
             SetFrame(0); // brace
-            yield return new WaitForSeconds(0.05f);
+            yield return new WaitForSeconds(0.02f);
             SetFrame(1);
         }
         else
@@ -296,9 +307,9 @@ public class PlayerPlatformer : MonoBehaviour
         SetFrame(6);
         yield return new WaitForSeconds(0.05f);
         SetFrame(7);
-        yield return new WaitForSeconds(0.05f);
+        yield return new WaitForSeconds(0.09f);
         SetFrame(8);
-        yield return new WaitForSeconds(0.05f);
+        yield return new WaitForSeconds(0.09f);
 
         anim.SetBool("isGrounded", true);
     }
@@ -382,12 +393,12 @@ public class PlayerPlatformer : MonoBehaviour
         if (!spriteRenderer.flipX) // Facing Right
         {
             playerCollider.offset = new Vector2(-0.06f, 0.007f); 
-            wallCheck.localPosition = new Vector2(0.5f, 0.8f); 
+            // wallCheck.localPosition = new Vector2(0.5f, 0.8f); 
         }
         else // Facing Left
         {
             playerCollider.offset = new Vector2(0.05f, 0.007f); 
-            wallCheck.localPosition = new Vector2(-0.5f, 0.8f);
+            // wallCheck.localPosition = new Vector2(-0.5f, 0.8f);
         }
     }
     void SetFrame(int frame)
@@ -403,6 +414,12 @@ public class PlayerPlatformer : MonoBehaviour
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
         }
+        // Draw Wall Check (Blue Line)
+    float direction = (spriteRenderer != null && spriteRenderer.flipX) ? -1f : 1f;
+    Vector3 wallOrigin = transform.position + new Vector3(0, 0.5f, 0);
+    
+    Gizmos.color = isTouchingWall ? Color.green : Color.blue;
+    Gizmos.DrawLine(wallOrigin, wallOrigin + (Vector3.right * direction * wallCheckDistance));
     }
 
     public void TriggerJumpTest()
