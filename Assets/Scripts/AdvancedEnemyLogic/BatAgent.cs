@@ -73,7 +73,7 @@ public class BatEnemyAI : Agent, IRewindable
             // Disable gravity
             rb.gravityScale = 0f;
             // Start bat in a random position every time, in the air
-            float randBatX = Random.Range(-6f, 14f);
+            float randBatX = Random.Range(-6f, 13f);
             float randBatY = Random.Range(1f, 6f);
             transform.localPosition = new Vector2(randBatX, randBatY);
             rb.linearVelocity = Vector2.zero;
@@ -83,7 +83,7 @@ public class BatEnemyAI : Agent, IRewindable
             playerRb.gravityScale = 0f; 
             playerRb.linearVelocity = Vector2.zero;
             playerRb.angularVelocity = 0f;
-            float randPlayerX = Random.Range(-6f, 14f);
+            float randPlayerX = Random.Range(-6f, 13f);
             // Player height slightly skewed to bottom, as that is most common
             float randPlayerY = Random.Range(1f, 6f);
             player.localPosition = new Vector2(randPlayerX, randPlayerY);
@@ -143,10 +143,14 @@ public class BatEnemyAI : Agent, IRewindable
         
         currentState = State.Chase;
 
-        float moveX = actions.ContinuousActions[0];
-        float moveY = actions.ContinuousActions[1];
+        float forwardAmount = actions.ContinuousActions[0];
+        float upAmount = actions.ContinuousActions[1];
 
-        Vector2 dir = new Vector2(moveX, moveY);
+        // Determine forward direction
+        float facingDirection = Mathf.Sign(transform.localScale.x);
+
+        Vector2 dir = new Vector2(forwardAmount * facingDirection, upAmount); 
+
         rb.linearVelocity = dir * moveSpeed;
 
         FacePlayer();
@@ -157,7 +161,7 @@ public class BatEnemyAI : Agent, IRewindable
             // Make sure speed is taken into account (longer, less reward)
             AddReward(-0.001f);
             // Reset and punish if bat gets too far away
-            if(distToPlayer > 15f)
+            if(distToPlayer > 25f)
             {
                 AddReward(-0.5f);
                 EndEpisode();
@@ -171,7 +175,7 @@ public class BatEnemyAI : Agent, IRewindable
                 AddReward(0.002f);
             }
             // Reward for being close to player
-            AddReward(-0.001f * distToPlayer);
+            // AddReward(-0.001f * distToPlayer);
         }
     }
     void Hover()
@@ -190,6 +194,11 @@ public class BatEnemyAI : Agent, IRewindable
                 AddReward(1.0f);
                 EndEpisode();
             }
+            // We don't want the bats to crash into walls
+            if (collision.gameObject.CompareTag("Ground"))
+            {
+                AddReward(-0.5f);
+            }
         }
     }
     private void OnCollisionStay2D(Collision2D collision)
@@ -201,7 +210,7 @@ public class BatEnemyAI : Agent, IRewindable
         }
         if (trainingMode)
         {
-            // If the bat hits a wall, punish them continuously
+            // If the bat is touching a wall, punish them continuously
             if (collision.gameObject.CompareTag("Ground"))
             {
                 AddReward(-0.01f);

@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 2637041425879578865}
   - component: {fileID: 8605598908534411275}
   - component: {fileID: 535482973285320641}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Selfish_AI_Flying_Bat
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -256,3 +256,4 @@ MonoBehaviour:
   health: 3
   attackCooldown: 1.5
   currentState: 1
+  obstacle: {fileID: 0}
