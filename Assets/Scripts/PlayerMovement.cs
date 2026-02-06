@@ -153,6 +153,7 @@ public class PlayerPlatformer : MonoBehaviour
             float xOffset = spriteRenderer.flipX ? -0.10f : 0.10f;
             playerCollider.offset = new Vector2(xOffset, playerCollider.offset.y);
             isWallSliding = true;
+            extraJumpsRemaining = 2;
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, Mathf.Clamp(rb.linearVelocity.y, -wallSlideSpeed, float.MaxValue));
         }
         else
