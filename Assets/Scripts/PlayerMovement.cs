@@ -84,9 +84,13 @@ public class PlayerPlatformer : MonoBehaviour
         if (TimeRewindManager.Instance != null && TimeRewindManager.Instance.IsRewinding)
             return;
 
-        horizontalInput = Keyboard.current != null
-            ? (Keyboard.current.aKey.isPressed ? -1f : 0f) + (Keyboard.current.dKey.isPressed ? 1f : 0f)
-            : 0f;
+        float kb = 0f;
+        if (Keyboard.current != null)
+            kb = (Keyboard.current.aKey.isPressed ? -1f : 0f) + (Keyboard.current.dKey.isPressed ? 1f : 0f);
+        float gp = 0f;
+        if (Gamepad.current != null)
+            gp = Gamepad.current.leftStick.x.ReadValue();
+        horizontalInput = Mathf.Clamp(kb + gp, -1f, 1f);
 
         UpdateCoyoteTime();
         UpdateAnimatorBase();
@@ -127,6 +131,9 @@ public class PlayerPlatformer : MonoBehaviour
     public void OnDash(InputAction.CallbackContext ctx)
     {
         if (!ctx.performed || isDashing) return;
+        var gamepad = Gamepad.current;
+        if (gamepad != null && ctx.control?.device == gamepad && gamepad.leftTrigger.ReadValue() > 0.5f)
+            return;
         StartCoroutine(DashRoutine());
     }
 
