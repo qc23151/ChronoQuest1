@@ -46,7 +46,7 @@ public class BatEnemyAI : Agent, IRewindable
         animator = GetComponent<Animator>();
         animator.ResetTrigger("Chase");
         animator.ResetTrigger("Attack");
-        partnerAgent = otherBat.GetComponent<BatEnemyAI>();
+        if(otherBat != null) partnerAgent = otherBat.GetComponent<BatEnemyAI>();
     }
 
     protected override void OnEnable()
@@ -137,14 +137,19 @@ public class BatEnemyAI : Agent, IRewindable
     public override void CollectObservations(VectorSensor sensor)
     {
         Vector2 toPlayer = playerCollider.bounds.center - transform.position;
-        Vector2 otherBatToPlayer = playerCollider.bounds.center - otherBat.transform.position;
-
         // Limit values so works in large rooms. 
         sensor.AddObservation(Mathf.Clamp(toPlayer.x, -20f, 20f));
         sensor.AddObservation(Mathf.Clamp(toPlayer.y, -20f, 20f));
 
-        sensor.AddObservation(Mathf.Clamp(otherBatToPlayer.x, -20f, 20f));
-        sensor.AddObservation(Mathf.Clamp(otherBatToPlayer.y, -20f, 20f));
+        if(otherBat != null){
+            Vector2 otherBatToPlayer = playerCollider.bounds.center - otherBat.transform.position;
+            sensor.AddObservation(Mathf.Clamp(otherBatToPlayer.x, -20f, 20f));
+            sensor.AddObservation(Mathf.Clamp(otherBatToPlayer.y, -20f, 20f));
+        } else
+        {
+            sensor.AddObservation(20f);
+            sensor.AddObservation(20f);
+        }
         
         // Let the bat know its velocity
         sensor.AddObservation(rb.linearVelocity.x);
@@ -192,9 +197,11 @@ public class BatEnemyAI : Agent, IRewindable
             {
                 AddReward(-0.5f);
                 EndEpisode();
-                if (partnerAgent.StepCount > 0)
-                {
-                    partnerAgent.EndEpisode();
+                if(otherBat != null){
+                    if (partnerAgent.StepCount > 0)
+                    {
+                        partnerAgent.EndEpisode();
+                    }
                 }
                 return;
             }
@@ -215,18 +222,22 @@ public class BatEnemyAI : Agent, IRewindable
            if (collision.gameObject.CompareTag("Player"))
             {
                 float batOffsetX = transform.position.x - collision.transform.position.x;
-                float otherBatOffsetX = otherBat.transform.position.x - collision.transform.position.x;
+                if(otherBat != null){
+                    float otherBatOffsetX = otherBat.transform.position.x - collision.transform.position.x;
 
-                if (batOffsetX * otherBatOffsetX < 0f) 
-                {
-                    // Extra reward for flank
-                    AddReward(1.0f);
+                    if (batOffsetX * otherBatOffsetX < 0f) 
+                    {
+                        // Extra reward for flank
+                        AddReward(1.0f);
+                    }
                 }
                 AddReward(1.0f);
                 EndEpisode();
-                if (partnerAgent.StepCount > 0)
-                {
-                    partnerAgent.EndEpisode();
+                if(otherBat != null){
+                    if (partnerAgent.StepCount > 0)
+                    {
+                        partnerAgent.EndEpisode();
+                    }
                 }
             }
             // We don't want the bats to crash into walls
