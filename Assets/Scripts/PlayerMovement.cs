@@ -97,6 +97,12 @@ public class PlayerPlatformer : MonoBehaviour
 
     private void Update()
     {
+        if (GetComponent<PlayerHealth>()?.IsDead == true)
+        {
+            anim.SetBool("isDead", true); 
+            return; 
+        }
+        
         if (isDashing) return;
         if (TimeRewindManager.Instance != null && TimeRewindManager.Instance.IsRewinding)
             return;
@@ -213,6 +219,9 @@ public class PlayerPlatformer : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (GetComponent<PlayerHealth>()?.IsDead == true)
+            return;
+
         if (TimeRewindManager.Instance != null && TimeRewindManager.Instance.IsRewinding)
             return;
 
@@ -221,10 +230,12 @@ public class PlayerPlatformer : MonoBehaviour
         rb.linearVelocity = new Vector2(horizontalInput * moveSpeed, rb.linearVelocity.y);
     }
 
-   
 
     public void OnJump(InputAction.CallbackContext context)
     {
+        if (GetComponent<PlayerHealth>()?.IsDead == true)
+            return;
+        
         if (context.performed)
         {
             // 1. Only do a Wall Jump if the player is ACTUALLY sliding
@@ -325,6 +336,9 @@ public class PlayerPlatformer : MonoBehaviour
 
     public void OnDash(InputAction.CallbackContext context)
     {
+        if (GetComponent<PlayerHealth>()?.IsDead == true)
+            return;
+        
         if (!context.performed || isDashing || _isRewinding) return;
         var gamepad = Gamepad.current;
         if (gamepad != null && context.control?.device == gamepad && gamepad.leftTrigger.ReadValue() > 0.5f)

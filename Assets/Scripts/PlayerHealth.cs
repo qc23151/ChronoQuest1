@@ -31,12 +31,14 @@ public class PlayerHealth : MonoBehaviour, IRewindable
     // Events
     public event Action<int, int> OnHealthChanged;
     public event Action OnDeath;
+    private Animator animator; 
 
     private void Awake()
     {
         // Find the sprite renderer so we can flash it. 
         // "GetComponentInChildren" works even if the sprite is on a child object.
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        animator = GetComponentInChildren<Animator>(); 
     }
 
     private void Start()
@@ -117,12 +119,49 @@ public class PlayerHealth : MonoBehaviour, IRewindable
         OnHealthChanged?.Invoke(currentHealth, maxHealth);
     }
 
+    private IEnumerator FreezeAnimatorAfterDeath()
+    {
+        // Wait until we're actually in the death state
+        while (!animator.GetCurrentAnimatorStateInfo(0).IsName("Player_Death"))
+            yield return null;
+
+        // Wait until the animation finishes
+        while (animator.GetCurrentAnimatorStateInfo(0).normalizedTime < 1f)
+            yield return null;
+
+        animator.enabled = false;
+    }
+
     private void Die()
     {
+        if (IsDead) return; 
         IsDead = true;
         OnDeath?.Invoke();
         Debug.Log("Player Died");
-        
+
+        if (animator != null)
+        {
+            animator.SetTrigger("Die"); 
+        }
+
+        var rb = GetComponent<Rigidbody2D>();
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector2.zero; 
+            rb.angularVelocity = 0f;
+            rb.constraints = RigidbodyConstraints2D.FreezeAll; 
+            rb.gravityScale = 0f;
+            rb.simulated = false; 
+        }
+
+        var col = GetComponent<Collider2D>(); 
+        if (col != null) col.enabled = false; 
+
+        var playerMovement = GetComponent<PlayerPlatformer>(); 
+        if (playerMovement != null) playerMovement.enabled = false;
+
+        StartCoroutine(FreezeAnimatorAfterDeath()); 
+
         // Ensure sprite is visible when dead (optional)
         if (spriteRenderer != null) spriteRenderer.enabled = true;
     }
