@@ -8,12 +8,9 @@ public class Fireball : MonoBehaviour, IRewindable
     private bool _isRewinding;
     private RigidbodyType2D _originalBodyType;
     private RewindState _lastAppliedState;
-    private float _spawnTime;
-    private float _repeatedFrameDuration;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        _spawnTime = Time.time;
         if (TimeRewindManager.Instance != null)
         {
             TimeRewindManager.Instance.Register(this);
@@ -44,8 +41,7 @@ public class Fireball : MonoBehaviour, IRewindable
     }
     public void OnStartRewind()
     {
-        _isRewinding = true; // Sets the flag that stops Update/FixedUpdate
-        _repeatedFrameDuration = 0f;
+        _isRewinding = true;
         // Make Rigidbody Kinematic so physics doesn't interfere
         if (rb == null) rb = GetComponent<Rigidbody2D>();
         _originalBodyType = rb.bodyType;
@@ -80,14 +76,12 @@ public class Fireball : MonoBehaviour, IRewindable
     }
     public void ApplyState(RewindState state)
     {
-        if (state.Timestamp <= _spawnTime + 0.02f)
-        {
-            if (_lastAppliedState.Timestamp == state.Timestamp)
+        // If the fireball reaches the spawn point, destroy it
+        if (transform.position.y > 8.5f)
             {
                 Destroy(gameObject);
                 return;
             }
-        }
         transform.position = state.Position;
         transform.rotation = state.Rotation;
         _lastAppliedState = state;
