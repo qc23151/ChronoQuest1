@@ -1,5 +1,7 @@
 using TimeRewind;
 using UnityEngine;
+using System.Collections;
+using System.Threading.Tasks;
 
 public class Boss : MonoBehaviour, IRewindable
 {
@@ -7,6 +9,7 @@ public class Boss : MonoBehaviour, IRewindable
     public float damageCooldown = 1.5f;
     public int damage = 1;
     public int health = 3;
+    private bool isAttacking;
 
     public Transform player;
     public BossAttackManager attackManager;
@@ -33,8 +36,8 @@ public class Boss : MonoBehaviour, IRewindable
         if (player == null) return;
         if (_isRewinding) return;
         // Use collision for attack, distance for chase
-        if (playerInContact)
-            currentState = State.Damage;
+        if (playerInContact) currentState = State.Damage;
+        else currentState = State.Fight;
 
         switch (currentState)
         {
@@ -49,21 +52,40 @@ public class Boss : MonoBehaviour, IRewindable
 
     void Fight()
     {
-        if (Time.time >= lastAttackTime + attackCooldown)
+        if (Time.time >= lastAttackTime + attackCooldown && !isAttacking)
         {
             lastAttackTime = Time.time;
-            Attack();
+            StartCoroutine(Attack());
         }
     }
 
-    void Attack()
+    IEnumerator Attack()
     {
-        Fireballs();
+        isAttacking = true;
+        if(Random.value > 1f){
+            yield return StartCoroutine(Fireballs());
+        }
+        else yield return StartCoroutine(FireColumns());
+        isAttacking = false;
     }
 
-    void Fireballs()
+    IEnumerator Fireballs()
     {
-        attackManager.spawnFireball();
+        WaitForSeconds wait = new WaitForSeconds(0.5f);
+        for(int i = 0; i < 15; i++) {
+            // Spawn a fireball
+            attackManager.spawnFireball();
+            // Wait 1 second
+            yield return wait;
+            // Repeat 15 times
+        }
+    }
+
+    IEnumerator FireColumns()
+    {
+        attackManager.fireColumns();
+        WaitForSeconds wait = new WaitForSeconds(5f);
+        yield return wait;
     }
 
     void Damage()

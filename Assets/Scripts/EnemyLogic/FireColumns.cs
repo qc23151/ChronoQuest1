@@ -1,18 +1,21 @@
  using TimeRewind;
 using UnityEditor.UI;
 using UnityEngine;
-public class Fireball : MonoBehaviour, IRewindable
+using UnityEngine.Animations;
+public class Firecolumns : MonoBehaviour, IRewindable
 {
     public int damage = 1;
     private Rigidbody2D rb;
     private bool _isRewinding;
+    private float startX;
     private RigidbodyType2D _originalBodyType;
     private RewindState _lastAppliedState;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        // Destroy after 12 seconds (5 seconds pre rewind, 5 seconds post rewind, 1 sec buffer for each)
-        Destroy(gameObject, 12f);
+        //Destroy after 12 seconds (5 seconds pre rewind, 5 seconds post rewind, 1 sec buffer for each)
+        Destroy(transform.parent.gameObject, 12f);
+        startX = transform.position.x;
         if (TimeRewindManager.Instance != null)
         {
             TimeRewindManager.Instance.Register(this);
@@ -22,20 +25,24 @@ public class Fireball : MonoBehaviour, IRewindable
     // Update is called once per frame
     void Update()
     {
+    }
 
+    void FixedUpdate()
+    {
+        rb.linearVelocity = new Vector2(-4f, 0);
+        if(transform.position.x < -11f)
+        {
+            gameObject.SetActive(false);
+        }
     }
     void OnDestroy()
     {
         if (TimeRewindManager.Instance != null) TimeRewindManager.Instance.Unregister(this);
     }
-    void OnTriggerEnter2D(Collider2D collision)
+    void OnCollisionEnter2D(Collision2D collision)
     {
         if (_isRewinding) return;
-        if (collision.gameObject.CompareTag("Ground"))
-        {
-            gameObject.SetActive(false);
-        }
-        PlayerHealth playerHealth = collision.GetComponent<PlayerHealth>();
+        PlayerHealth playerHealth = collision.gameObject.GetComponent<PlayerHealth>();
         if (playerHealth != null)
         {
             playerHealth.ModifyHealth(-damage);
@@ -78,15 +85,10 @@ public class Fireball : MonoBehaviour, IRewindable
     }
     public void ApplyState(RewindState state)
     {
-        // If the fireball reaches the spawn point, destroy it
-        if (transform.position.y > 8.5f)
-            {
-                Destroy(gameObject);
-                return;
-            }
         transform.position = state.Position;
         transform.rotation = state.Rotation;
         _lastAppliedState = state;
+        if(transform.position.x > startX - 0.2f) Destroy(transform.parent.gameObject);
         // Custom state, true is default
         bool wasActive = state.GetCustomData<bool>("IsActive", true);
         // Only change the state if it's different to avoid overhead
