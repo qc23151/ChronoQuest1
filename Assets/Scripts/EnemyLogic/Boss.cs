@@ -19,8 +19,6 @@ public class Boss : MonoBehaviour, IRewindable
     private Vector3 originalScale;
     private Animator animator;
     private bool playerInContact = false;
-    private enum State { Fight, Damage }
-    private State currentState = State.Fight;
 
     void Start()
     {
@@ -28,54 +26,45 @@ public class Boss : MonoBehaviour, IRewindable
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
         if (TimeRewindManager.Instance != null) TimeRewindManager.Instance.Register(this);
+        StartCoroutine(AttackLoop());
     }
 
     void Update()
     {
         if (player == null) return;
         if (_isRewinding) return;
-        // Use collision for attack, distance for chase
-        if (playerInContact) currentState = State.Damage;
-        else currentState = State.Fight;
+    }
 
-        switch (currentState)
-        {
-            case State.Fight:
-                Fight();
-                break;
-            case State.Damage:
-                Damage();
-                break;
+    IEnumerator AttackLoop()
+    {   
+        while (health > 0){
+            yield return new WaitForSeconds(2f);
+            while (_isRewinding) yield return null;
+            yield return StartCoroutine(FullAttack());
         }
     }
 
-    void Fight()
+    IEnumerator FullAttack()
     {
-        if (Time.time >= lastAttackTime + attackCooldown && !isAttacking)
-        {
-            lastAttackTime = Time.time;
-            StartCoroutine(Attack());
-        }
+        while (_isRewinding) yield return null;
+        Coroutine restrict = StartCoroutine(RestrictiveMove());
+        Coroutine attack = StartCoroutine(OffensiveMove());
+        yield return restrict;
+        yield return attack;
     }
 
-    IEnumerator Attack()
+    IEnumerator RestrictiveMove()
     {
-        isAttacking = true;
-        StartCoroutine(Restrict());
-        yield return StartCoroutine(PerformAttack());
-        isAttacking = false;
-    }
-
-    IEnumerator Restrict()
-    {
+        while (_isRewinding) yield return null;
         if(Random.value > 0.5f)
         {
             yield return StartCoroutine(FireRow());
-        } else yield return 0; 
+        } else yield return StartCoroutine(FireWave()); 
     }
 
-    IEnumerator PerformAttack()
+    IEnumerator OffensiveMove()
     {
+        while (_isRewinding) yield return null;
         if(Random.value > 0.5f){
             yield return StartCoroutine(Fireballs());
         }
@@ -84,11 +73,12 @@ public class Boss : MonoBehaviour, IRewindable
 
     IEnumerator Fireballs()
     {
+        while (_isRewinding) yield return null;
         WaitForSeconds wait = new WaitForSeconds(0.5f);
         for(int i = 0; i < 15; i++) {
             // Spawn a fireball
             if(!_isRewinding) attackManager.spawnFireball();
-            // Wait 1 second
+            // Wait 0.5 second
             yield return wait;
             // Repeat 15 times
         }
@@ -96,6 +86,7 @@ public class Boss : MonoBehaviour, IRewindable
 
     IEnumerator FireColumns()
     {
+        while (_isRewinding) yield return null;
         if(!_isRewinding) attackManager.spawnFireColumns();
         WaitForSeconds wait = new WaitForSeconds(5f);
         yield return wait;
@@ -103,9 +94,23 @@ public class Boss : MonoBehaviour, IRewindable
 
     IEnumerator FireRow()
     {
+        while (_isRewinding) yield return null;
         if(!_isRewinding) attackManager.spawnFireRow();
         WaitForSeconds wait = new WaitForSeconds(7f);
         yield return wait;
+    }
+
+    IEnumerator FireWave()
+    {
+        while (_isRewinding) yield return null;
+        WaitForSeconds wait = new WaitForSeconds(1f);
+        for(int i = 0; i < 7; i++) {
+            // Spawn a fireball
+            if(!_isRewinding) attackManager.spawnFireWave();
+            // Wait 2 seconds
+            yield return wait;
+            // Repeat 4 times
+        }
     }
 
     void Damage()
@@ -128,19 +133,9 @@ public class Boss : MonoBehaviour, IRewindable
     {
         if (collision.gameObject.CompareTag("Player"))
         {
-            playerInContact = true;
+            Damage();
         }
     }
-
-    // Called when colliders separate
-    void OnCollisionExit2D(Collision2D collision)
-    {
-        if (collision.gameObject.CompareTag("Player"))
-        {
-            playerInContact = false;
-        }
-    }
-
     public void TakeDamage(int amount)
     {
         health -= amount;
@@ -151,23 +146,19 @@ public class Boss : MonoBehaviour, IRewindable
             Die();
         }
     }
-
     void Die()
     {
         Debug.Log("Boss died!");
         Destroy(gameObject);
     }
-
     public void OnStartRewind()
     {
         _isRewinding = true; // Sets the flag that stops Update/FixedUpdate
     }
-
     public void OnStopRewind()
     {
         _isRewinding = false;
     }
-
     public RewindState CaptureState()
     {
         var state = RewindState.CreateWithPhysics(
@@ -177,7 +168,6 @@ public class Boss : MonoBehaviour, IRewindable
             (rb != null) ? rb.angularVelocity : 0f,
             Time.time
         );
-
         // Save data using Dictionary
         state.Health = health;
         return state;
@@ -188,6 +178,5 @@ public class Boss : MonoBehaviour, IRewindable
         transform.position = state.Position;
         transform.rotation = state.Rotation;
         health = state.Health;
-
     }
 }

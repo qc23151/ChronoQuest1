@@ -1,15 +1,19 @@
 using TimeRewind;
 using UnityEngine;
-public class Fireball : MonoBehaviour, IRewindable
+public class FireWave : MonoBehaviour, IRewindable
 {
     public int damage = 1;
     private Rigidbody2D rb;
     private bool _isRewinding;
+    private float startTime;
     private RigidbodyType2D _originalBodyType;
     private RewindState _lastAppliedState;
+    private Vector2 currentVelocity;
+    public float moveSpeed = 2f;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        startTime = Time.time;
         // Destroy after 12 seconds (5 seconds pre rewind, 5 seconds post rewind, 1 sec buffer for each)
         Destroy(gameObject, 12f);
         if (TimeRewindManager.Instance != null)
@@ -23,21 +27,26 @@ public class Fireball : MonoBehaviour, IRewindable
     {
 
     }
+
+    void FixedUpdate()
+    {
+        if(_isRewinding) return;
+        currentVelocity = new Vector2(-5f, 0f) * moveSpeed;
+        rb.MovePosition(rb.position + currentVelocity * Time.fixedDeltaTime);
+        if(transform.position.x < -15f) gameObject.SetActive(false);
+    }
     void OnDestroy()
     {
         if (TimeRewindManager.Instance != null) TimeRewindManager.Instance.Unregister(this);
     }
-    void OnTriggerEnter2D(Collider2D collision)
+    void OnCollisionEnter2D(Collision2D collision)
     {
         if (_isRewinding) return;
-        if (collision.gameObject.CompareTag("Ground"))
-        {
-            gameObject.SetActive(false);
-        }
-        PlayerHealth playerHealth = collision.GetComponent<PlayerHealth>();
+        PlayerHealth playerHealth = collision.gameObject.GetComponent<PlayerHealth>();
         if (playerHealth != null)
         {
             playerHealth.ModifyHealth(-damage);
+            gameObject.SetActive(false);
         }
     }
     public void OnStartRewind()
@@ -77,12 +86,11 @@ public class Fireball : MonoBehaviour, IRewindable
     }
     public void ApplyState(RewindState state)
     {
-        // If the fireball reaches the spawn point, destroy it
-        if (transform.position.y > 8.5f)
-            {
-                Destroy(gameObject);
-                return;
-            }
+        if (state.Timestamp <= startTime + 0.1f)
+        {
+            Destroy(gameObject);
+            return; 
+        }
         transform.position = state.Position;
         transform.rotation = state.Rotation;
         _lastAppliedState = state;

@@ -5,6 +5,7 @@ public class BossAttackManager : MonoBehaviour
     public GameObject fireball;
     public GameObject fireColumn;
     public GameObject fireRow;
+    public GameObject fireWave;
     public Transform player;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -33,5 +34,10 @@ public class BossAttackManager : MonoBehaviour
     public void spawnFireRow()
     {
         Instantiate(fireRow, new Vector3(2.5f, -4.25f, 0f), transform.rotation);
+    }
+
+    public void spawnFireWave()
+    {
+        Instantiate(fireWave, new Vector3(4.5f, -6.5f, 0f), transform.rotation);
     }
 }
