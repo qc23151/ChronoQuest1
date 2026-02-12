@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4245851786995062671}
   - component: {fileID: 8349521445026381996}
   - component: {fileID: 3811212546148814024}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: FireWave
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -93,7 +93,7 @@ CompositeCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -133,7 +133,7 @@ GameObject:
   - component: {fileID: 7012640075591539601}
   - component: {fileID: 9073758097697559695}
   - component: {fileID: 5881177218484698100}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: Circle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -244,7 +244,7 @@ CircleCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -261,7 +261,7 @@ GameObject:
   - component: {fileID: 6999127791404323212}
   - component: {fileID: 8302111981320539722}
   - component: {fileID: 2504791597309632266}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: Base
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -372,7 +372,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0

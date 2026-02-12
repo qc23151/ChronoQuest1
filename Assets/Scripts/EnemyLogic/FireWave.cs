@@ -39,14 +39,14 @@ public class FireWave : MonoBehaviour, IRewindable
     {
         if (TimeRewindManager.Instance != null) TimeRewindManager.Instance.Unregister(this);
     }
-    void OnCollisionEnter2D(Collision2D collision)
+    void OnTriggerEnter2D(Collider2D collision)
     {
         if (_isRewinding) return;
         PlayerHealth playerHealth = collision.gameObject.GetComponent<PlayerHealth>();
         if (playerHealth != null)
         {
             playerHealth.ModifyHealth(-damage);
-            gameObject.SetActive(false);
+            //gameObject.SetActive(false);
         }
     }
     public void OnStartRewind()
