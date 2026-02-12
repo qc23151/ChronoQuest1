@@ -1,6 +1,8 @@
  using TimeRewind;
 using UnityEditor.UI;
 using UnityEngine;
+using System.Collections; 
+
 public class Fireball : MonoBehaviour, IRewindable
 {
     public int damage = 1;
@@ -31,16 +33,41 @@ public class Fireball : MonoBehaviour, IRewindable
     void OnTriggerEnter2D(Collider2D collision)
     {
         if (_isRewinding) return;
-        if (collision.gameObject.CompareTag("Ground"))
+        /* if (collision.gameObject.CompareTag("Ground"))
         {
             gameObject.SetActive(false);
-        }
+        } */ 
         PlayerHealth playerHealth = collision.GetComponent<PlayerHealth>();
         if (playerHealth != null)
         {
             playerHealth.ModifyHealth(-damage);
         }
+
+        if (collision.CompareTag("Ground"))
+        {
+            Animator anim = GetComponent<Animator>(); 
+            
+            if (anim != null)
+            {
+                anim.SetTrigger("HitGround"); 
+            }
+
+            rb.linearVelocity = Vector2.zero;
+            rb.bodyType = RigidbodyType2D.Kinematic; 
+            
+            transform.position += Vector3.up * 0.7f; 
+
+            // Destroy(gameObject, 0.5f); 
+            StartCoroutine(DestroyAfterImpact()); 
+        }
     }
+
+    private IEnumerator DestroyAfterImpact()
+    {
+        yield return new WaitForSeconds(0.5f);
+        Destroy(gameObject); 
+    }
+
     public void OnStartRewind()
     {
         _isRewinding = true;
