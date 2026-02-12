@@ -1,7 +1,6 @@
 using TimeRewind;
 using UnityEngine;
 using System.Collections;
-using System.Threading.Tasks;
 
 public class Boss : MonoBehaviour, IRewindable
 {
@@ -62,11 +61,25 @@ public class Boss : MonoBehaviour, IRewindable
     IEnumerator Attack()
     {
         isAttacking = true;
+        StartCoroutine(Restrict());
+        yield return StartCoroutine(PerformAttack());
+        isAttacking = false;
+    }
+
+    IEnumerator Restrict()
+    {
+        if(Random.value > 0.5f)
+        {
+            yield return StartCoroutine(FireRow());
+        } else yield return 0; 
+    }
+
+    IEnumerator PerformAttack()
+    {
         if(Random.value > 0.5f){
             yield return StartCoroutine(Fireballs());
         }
         else yield return StartCoroutine(FireColumns());
-        isAttacking = false;
     }
 
     IEnumerator Fireballs()
@@ -74,7 +87,7 @@ public class Boss : MonoBehaviour, IRewindable
         WaitForSeconds wait = new WaitForSeconds(0.5f);
         for(int i = 0; i < 15; i++) {
             // Spawn a fireball
-            attackManager.spawnFireball();
+            if(!_isRewinding) attackManager.spawnFireball();
             // Wait 1 second
             yield return wait;
             // Repeat 15 times
@@ -83,8 +96,15 @@ public class Boss : MonoBehaviour, IRewindable
 
     IEnumerator FireColumns()
     {
-        attackManager.fireColumns();
+        if(!_isRewinding) attackManager.spawnFireColumns();
         WaitForSeconds wait = new WaitForSeconds(5f);
+        yield return wait;
+    }
+
+    IEnumerator FireRow()
+    {
+        if(!_isRewinding) attackManager.spawnFireRow();
+        WaitForSeconds wait = new WaitForSeconds(7f);
         yield return wait;
     }
 

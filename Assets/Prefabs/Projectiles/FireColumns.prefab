@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 1242331537018533324}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -10.55, y: -1.10976, z: 0}
+  m_LocalPosition: {x: 0, y: -1.10976, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -48,6 +48,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: NewAssembly::Firecolumns
   damage: 1
+  moveSpeed: 3
+  timeToChange: 1
 --- !u!50 &1977647861628137809
 Rigidbody2D:
   serializedVersion: 5
@@ -102,7 +104,7 @@ Transform:
   m_GameObject: {fileID: 5901631263720435448}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.86553, y: -0.49023998, z: 0}
+  m_LocalPosition: {x: -3.5, y: -0.49023998, z: 0}
   m_LocalScale: {x: 1, y: 10, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -240,7 +242,7 @@ Transform:
   m_GameObject: {fileID: 8072843804906319453}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 7.86553, y: -0.49023998, z: 0}
+  m_LocalPosition: {x: 3.5, y: -0.49023998, z: 0}
   m_LocalScale: {x: 1, y: 10, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

@@ -1,17 +1,18 @@
  using TimeRewind;
 using UnityEngine;
-public class Firecolumns : MonoBehaviour, IRewindable
+public class FireRow : MonoBehaviour, IRewindable
 {
     public int damage = 1;
     public float moveSpeed = 3f;
-    public float timeToChange = 1f;
     private Rigidbody2D rb;
     private bool _isRewinding;
     private RigidbodyType2D _originalBodyType;
     private RewindState _lastAppliedState;
-    private float nextChangeTime;
-    private Vector2 currentVelocity;
+    public Transform fireVisual;
     private float startTime;
+    public float maxGrowSize = 17;
+    private float currentGrowSize;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -23,26 +24,28 @@ public class Firecolumns : MonoBehaviour, IRewindable
         }     
         rb = GetComponent<Rigidbody2D>();
         startTime = Time.time;
-        nextChangeTime = startTime + 0.2f;
+        currentGrowSize = 1f;
     }
-    // Update is called once per frame
+
+    void Grow(float scale)
+    {
+        fireVisual.localScale = new Vector3(scale, 1f, 1f);
+        fireVisual.localPosition = new Vector3((-scale / 2f) + 0.5f, 0f, 0f);
+    }
     void Update()
     {
     }
 
     void FixedUpdate()
     {
-        if(_isRewinding) return;
-        if (Time.time >= nextChangeTime)
-        {
-            if (Random.value > 0.5f) currentVelocity = new Vector2(-1f, 0f) * moveSpeed;
-            else currentVelocity = new Vector2(1f, 0f) * moveSpeed;
-            nextChangeTime = Time.time + timeToChange;
+        if(currentGrowSize < maxGrowSize){
+            Grow(currentGrowSize);
+            currentGrowSize += 0.5f;
         }
-        if (transform.position.x < -9f) currentVelocity = new Vector2(1f, 0f) * moveSpeed;
-        if (transform.position.x > -1f) currentVelocity = new Vector2(-1f, 0f) * moveSpeed;
-        if(Time.time > startTime + 5f) gameObject.SetActive(false);
-        rb.MovePosition(rb.position + currentVelocity * Time.fixedDeltaTime);
+        if(Time.time - startTime > 6f)
+        {
+            gameObject.SetActive(false);
+        }
     }
     void OnDestroy()
     {
@@ -77,7 +80,6 @@ public class Firecolumns : MonoBehaviour, IRewindable
             rb.linearVelocity = _lastAppliedState.Velocity;
             rb.angularVelocity = _lastAppliedState.AngularVelocity;
         }
-        nextChangeTime = Time.time + timeToChange;
     }
     public RewindState CaptureState()
     {
