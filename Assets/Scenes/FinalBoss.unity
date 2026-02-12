@@ -10968,6 +10968,7 @@ MonoBehaviour:
   fireColumn: {fileID: 1242331537018533324, guid: 2a7bf4bfd89eb954387af276434580a7, type: 3}
   fireRow: {fileID: 8350819984362886484, guid: 689016a0676ac84418b2fb60afb9d0c4, type: 3}
   fireWave: {fileID: 1228122738348930315, guid: 175154f0f0616cc40a5934a323a5166b, type: 3}
+  slime: {fileID: 6869955167663698504, guid: ed1c8a4090a4b5245a02195c51b991f1, type: 3}
   player: {fileID: 1139432062}
 --- !u!4 &1348428425
 Transform:

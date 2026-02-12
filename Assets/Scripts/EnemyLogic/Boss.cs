@@ -55,11 +55,14 @@ public class Boss : MonoBehaviour, IRewindable
 
     IEnumerator RestrictiveMove()
     {
+        float rand = Random.value;
         while (_isRewinding) yield return null;
-        if(Random.value > 0.5f)
+        if(rand > 0.5f)
         {
-            yield return StartCoroutine(FireRow());
-        } else yield return StartCoroutine(FireWave()); 
+            if(rand > 0.75f) yield return StartCoroutine(FireRow());
+            else yield return StartCoroutine(FireWave()); 
+        } else if (rand > 0.25f) yield return StartCoroutine(Enemy());
+        else yield return 0;
     }
 
     IEnumerator OffensiveMove()
@@ -111,6 +114,14 @@ public class Boss : MonoBehaviour, IRewindable
             yield return wait;
             // Repeat 4 times
         }
+    }
+
+    IEnumerator Enemy()
+    {
+        while (_isRewinding) yield return null;
+        if(!_isRewinding) attackManager.spawnEnemy();
+        WaitForSeconds wait = new WaitForSeconds(7f);
+        yield return wait;
     }
 
     void Damage()

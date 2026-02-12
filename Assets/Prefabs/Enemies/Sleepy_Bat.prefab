@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 1811053938198170512}
   - component: {fileID: 1688266432399413266}
   - component: {fileID: 1546874184185271210}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Sleepy_Bat
   m_TagString: Untagged
   m_Icon: {fileID: 0}

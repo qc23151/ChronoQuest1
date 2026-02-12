@@ -293,7 +293,7 @@ MonoBehaviour:
   dashCooldown: 1
   dashPhaseLayers:
     serializedVersion: 2
-    m_Bits: 9
+    m_Bits: 1033
   horizontalInput: 0
   anim: {fileID: 0}
   spriteRenderer: {fileID: 0}

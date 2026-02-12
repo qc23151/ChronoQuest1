@@ -6,6 +6,7 @@ public class BossAttackManager : MonoBehaviour
     public GameObject fireColumn;
     public GameObject fireRow;
     public GameObject fireWave;
+    public GameObject slime;
     public Transform player;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -39,5 +40,18 @@ public class BossAttackManager : MonoBehaviour
     public void spawnFireWave()
     {
         Instantiate(fireWave, new Vector3(4.5f, -6.5f, 0f), transform.rotation);
+    }
+
+    public void spawnEnemy()
+    {
+        float randX = Random.Range(-12f, 2.5f);
+        if(Random.value > 0f) {
+            GameObject newSlime = Instantiate(slime, new Vector3(randX, 6f, 0f), transform.rotation);
+            SlimeEnemy slimeComponent = newSlime.GetComponent<SlimeEnemy>();
+            if (slimeComponent != null)
+            {
+                slimeComponent.player = player;
+            }
+        }
     }
 }
