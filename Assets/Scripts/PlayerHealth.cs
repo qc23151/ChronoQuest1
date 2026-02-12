@@ -122,25 +122,26 @@ public class PlayerHealth : MonoBehaviour, IRewindable
 
     private IEnumerator FreezeAnimatorAfterDeath()
     {
-        // Wait until we're actually in the death state
+        // waits until in the death state
         while (!animator.GetCurrentAnimatorStateInfo(0).IsName("Player_Death"))
             yield return null;
 
-        // Wait until the animation finishes
+        // wait until the animation finishes
         while (animator.GetCurrentAnimatorStateInfo(0).normalizedTime < 1f)
             yield return null;
 
-        animator.enabled = false;
+        animator.enabled = false;       // disables the animator 
     }
 
     private IEnumerator HandleDeath()
     {
-        var playerMovement = GetComponent<PlayerPlatformer>(); 
+        var playerMovement = GetComponent<PlayerPlatformer>();  
         var rb = GetComponent<Rigidbody2D>();
         var col = GetComponent<Collider2D>(); 
-        
+
         if (col != null) col.enabled = false;
 
+        // sets the death animation to trigger
         if (animator != null)
         {
             animator.SetTrigger("Die"); 
@@ -153,6 +154,7 @@ public class PlayerHealth : MonoBehaviour, IRewindable
                 yield return null; 
         }
 
+        // disables all player movement once grounded and death animation has run
         if (playerMovement != null) 
             playerMovement.enabled = false; 
 
@@ -174,11 +176,8 @@ public class PlayerHealth : MonoBehaviour, IRewindable
                 yield return null; 
         }
 
+        // shows the game over screen once death sequence has finished
         if (gameOverUI != null) gameOverUI.ShowGameOver(); 
-
-        // OnDeath?.Invoke(); 
-
-        // StartCoroutine(FreezeAnimatorAfterDeath()); 
     }
 
     private void Die()
