@@ -1,6 +1,6 @@
  using TimeRewind;
 using UnityEngine;
-public class FireRow : MonoBehaviour, IRewindable
+public class FloorFireRow : MonoBehaviour, IRewindable
 {
     public int damage = 1;
     public float moveSpeed = 3f;
@@ -11,7 +11,7 @@ public class FireRow : MonoBehaviour, IRewindable
     private bool fullSizeReached = false;
     public Transform fireVisual;
     private float startTime;
-    public float maxGrowSize = 17f;
+    public float maxGrowSize = 24.5f;
     private float currentGrowSize;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -42,7 +42,7 @@ public class FireRow : MonoBehaviour, IRewindable
         if (!fullSizeReached){
             if(currentGrowSize < maxGrowSize){
                 Grow(currentGrowSize);
-                currentGrowSize += 0.5f;
+                currentGrowSize += 0.25f;
             } else fullSizeReached = true;
         }
         else
@@ -122,6 +122,9 @@ public class FireRow : MonoBehaviour, IRewindable
         {
             gameObject.SetActive(wasActive);
         }
+        currentGrowSize = state.GetCustomData<float>("GrowSize", 1f);
+        fullSizeReached = state.GetCustomData<bool>("FullSize", false);
+        Grow(currentGrowSize);
     }
 }
 

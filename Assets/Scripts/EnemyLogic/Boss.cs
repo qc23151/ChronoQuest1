@@ -62,7 +62,7 @@ public class Boss : MonoBehaviour, IRewindable
             if(rand > 0.75f) yield return StartCoroutine(FireRow());
             else yield return StartCoroutine(FireWave()); 
         } else if (rand > 0.25f) yield return StartCoroutine(Enemy());
-        else yield return 0;
+        else yield return StartCoroutine(Platforms());
     }
 
     IEnumerator OffensiveMove()
@@ -114,6 +114,21 @@ public class Boss : MonoBehaviour, IRewindable
             yield return wait;
             // Repeat 4 times
         }
+    }
+
+    IEnumerator Platforms()
+    {
+        while (_isRewinding) yield return null;
+        WaitForSeconds wait = new WaitForSeconds(7f);
+        WaitForSeconds wait2 = new WaitForSeconds(1f);
+            if(!_isRewinding) {
+                attackManager.raisePlatforms();
+                // Allow time for player to react to platforms
+                yield return wait2;
+                attackManager.spawnFloorFire();
+                yield return wait;
+            }
+        attackManager.lowerPlatforms();
     }
 
     IEnumerator Enemy()
@@ -169,6 +184,8 @@ public class Boss : MonoBehaviour, IRewindable
     public void OnStopRewind()
     {
         _isRewinding = false;
+        StopAllCoroutines();
+        StartCoroutine(AttackLoop());
     }
     public RewindState CaptureState()
     {

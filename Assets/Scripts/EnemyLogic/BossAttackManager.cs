@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class BossAttackManager : MonoBehaviour
 {
@@ -7,6 +8,8 @@ public class BossAttackManager : MonoBehaviour
     public GameObject fireRow;
     public GameObject fireWave;
     public GameObject slime;
+    public GameObject platforms;
+    public GameObject floorFire;
     public Transform player;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -53,5 +56,37 @@ public class BossAttackManager : MonoBehaviour
                 slimeComponent.player = player;
             }
         }
+    }
+
+    public void raisePlatforms()
+    {
+        StartCoroutine(movePlatform(platforms.transform.position + Vector3.up * 5f));
+    }
+
+    public void lowerPlatforms()
+    {
+        StartCoroutine(movePlatform(platforms.transform.position - Vector3.up * 5f));
+    }
+
+    private IEnumerator movePlatform(Vector3 targetPos)
+    {
+        Rigidbody2D rb = platforms.GetComponent<Rigidbody2D>();
+        Vector3 startPos = platforms.transform.position;
+        float duration = 2f;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            rb.MovePosition(Vector2.Lerp(startPos, targetPos, elapsed / duration));
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        platforms.transform.position = targetPos;
+    }
+
+    public void spawnFloorFire()
+    {
+        Instantiate(floorFire, new Vector3(11f, -6.75f, 0f), transform.rotation);
     }
 }
