@@ -6,11 +6,17 @@ public class PlayerCombat : MonoBehaviour
     [Header("Melee Settings")]
     public float meleeRange = 1.2f;
     public int meleeDamage = 1;
-    public float attackOffset = 1.0f; // Distance in front of player
+    public float attackOffset = 2.0f; // Distance in front of player
 
     [Header("Spell Settings")]
     public GameObject spellPrefab;
     public Transform firePoint;
+
+    private Animator anim;
+
+    void Start(){
+        anim = GetComponent<Animator>();
+    }
 
     void Update()
     {
@@ -37,6 +43,10 @@ public class PlayerCombat : MonoBehaviour
 
     private void PerformMelee()
     {
+        if(anim != null){
+            anim.SetTrigger("Slash");
+        }
+
         // Calculate the center of the hit circle
         Vector2 attackPosition = (Vector2)transform.position + ((Vector2)transform.right * attackOffset);
         
@@ -48,7 +58,6 @@ public class PlayerCombat : MonoBehaviour
             SlimeEnemy slime = enemy.GetComponent<SlimeEnemy>();
             if (slime != null)
             {
-                // CALL THE METHOD IN YOUR SLIME SCRIPT
                 slime.TakeDamage(meleeDamage);
                 Debug.Log("Melee hit the slime!");
             }
