@@ -275,6 +275,24 @@ public class SlimeEnemy : MonoBehaviour, IRewindable
         if (health <= 0) Die();
     }
 
+    public void ApplyKnockback(Vector2 force)
+    {
+        // If we are mid-jump, we stop the jump so the knockback actually moves us
+        if (isMidJumpSequence)
+        {
+            StopAllCoroutines();
+            isMidJumpSequence = false;
+            currentStateLabel = "Knockback";
+        }
+
+        if (rb != null)
+        {
+            // Reset velocity first so the knockback is consistent
+            rb.linearVelocity = Vector2.zero; 
+            rb.AddForce(force, ForceMode2D.Impulse);
+        }
+    }
+
     void Die()
     {
         wasDead = true;

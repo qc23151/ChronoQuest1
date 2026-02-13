@@ -4,13 +4,16 @@ using UnityEngine.InputSystem;
 public class PlayerCombat : MonoBehaviour
 {
     [Header("Melee Settings")]
-    public float meleeRange = 1.2f;
+    public float meleeRange = 3.0f;
     public int meleeDamage = 1;
-    public float attackOffset = 2.0f; // Distance in front of player
+    public float attackOffset = 1.0f; // Distance in front of player
 
     [Header("Spell Settings")]
     public GameObject spellPrefab;
     public Transform firePoint;
+
+    [Header("Knockback")]
+    public float knockbackStrength = 8f;
 
     private Animator anim;
 
@@ -46,11 +49,12 @@ public class PlayerCombat : MonoBehaviour
         if(anim != null){
             anim.SetTrigger("Slash");
         }
+    }
 
-        // Calculate the center of the hit circle
+    public void HitEnemy() 
+    {
+    // Move your damage logic here
         Vector2 attackPosition = (Vector2)transform.position + ((Vector2)transform.right * attackOffset);
-        
-        // Find all colliders inside that circle
         Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPosition, meleeRange);
 
         foreach (Collider2D enemy in hitEnemies)
@@ -59,7 +63,10 @@ public class PlayerCombat : MonoBehaviour
             if (slime != null)
             {
                 slime.TakeDamage(meleeDamage);
-                Debug.Log("Melee hit the slime!");
+            
+                Vector2 knockbackDir = (enemy.transform.position - transform.position).normalized;
+                slime.ApplyKnockback(knockbackDir * knockbackStrength);
+                Debug.Log("Melee hit confirmed via Animation Event!");
             }
         }
     }
