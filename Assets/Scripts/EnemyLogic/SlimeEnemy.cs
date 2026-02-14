@@ -8,7 +8,7 @@ using TimeRewind;
 /// 2. Player detection and damage logic.
 /// 3. Integration with the TimeRewind system.
 /// </summary>
-public class SlimeEnemy : MonoBehaviour, IRewindable
+public class SlimeEnemy : EnemyBase, IRewindable
 {
     [Header("Stats")]
     public float detectionRange = 5f;
@@ -32,7 +32,6 @@ public class SlimeEnemy : MonoBehaviour, IRewindable
     public Transform player;
 
     private Animator animator;
-    private Rigidbody2D rb;
     private SpriteRenderer spriteRenderer;
 
     private float lastAttackTime;
@@ -269,31 +268,18 @@ public class SlimeEnemy : MonoBehaviour, IRewindable
         }
     }
 
-    public void TakeDamage(int amount)
+    public override void ApplyKnockback(Vector2 force)
     {
-        health -= amount;
-        if (health <= 0) Die();
-    }
-
-    public void ApplyKnockback(Vector2 force)
-    {
-        // If we are mid-jump, we stop the jump so the knockback actually moves us
         if (isMidJumpSequence)
         {
             StopAllCoroutines();
             isMidJumpSequence = false;
-            currentStateLabel = "Knockback";
         }
 
-        if (rb != null)
-        {
-            // Reset velocity first so the knockback is consistent
-            rb.linearVelocity = Vector2.zero; 
-            rb.AddForce(force, ForceMode2D.Impulse);
-        }
+        base.ApplyKnockback(force);
     }
 
-    void Die()
+    protected override void Die()
     {
         wasDead = true;
         
